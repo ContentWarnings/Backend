@@ -1,0 +1,86 @@
+# References
+# https://github.com/serverless/examples/blob/v3/aws-python-flask-dynamodb-api/serverless.yml
+# https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+# https://github.com/jordaneremieff/serverless-mangum-examples/blob/main/fastapi-example/serverless.yml
+# https://github.com/serverless/serverless/blob/main/docs/providers/aws/events/apigateway.md
+# https://github.com/dougmoscrop/serverless-http/blob/master/docs/EXAMPLES.md
+
+service: content-warnings-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  stage: prod # change while on feature branches!
+  apiGateway:
+    apiKeys:
+      - secretKey1
+    usagePlan:
+      quota:
+        limit: 5000
+        offset: 2
+        period: MONTH
+      throttle:
+        burstLimit: 200
+        rateLimit: 100
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          # allows this resource to be modified on sls deploy.
+          Resource:
+            - Fn::GetAtt: [MoviesTable, Arn]
+  environment:
+    MOVIES_TABLE: ${self:custom.tableName}
+
+# REST API (gives more functionality than HTTP API)
+# to change to an HTTP API, simply replace "http" with "httpApi: '*'"
+functions:
+  app:
+    handler: src.main.handler
+    events:
+      - http:
+          path: /{any+}
+          method: ANY
+          private: true
+      - http:
+          path: /
+          method: ANY
+          private: true
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+    pythonBin: python3
+  tableName: 'the-movies-table-${self:provider.stage}'
+
+package:
+  exclude:
+    - "*/*"
+  include:
+    - "src/*"
+
+plugins:
+  - serverless-python-requirements
+
+resources:
+  Resources:
+    MoviesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: movieName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: movieName
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
