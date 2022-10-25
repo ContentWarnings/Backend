@@ -1,0 +1,16 @@
+# References
+# https://github.com/psf/black/blob/main/docs/integrations/github_actions.md
+
+name: Lint w/Black
+
+on:
+  push:
+    paths:
+      - 'src/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: psf/black@stable
