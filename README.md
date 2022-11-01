@@ -26,7 +26,7 @@ This is the home for our Python/FastAPI AWS backend for senior design. Please re
 1. Ask yourself if the resource can be cited at all. If the resource is a tutorial, you can implicitly use the technique, but without a license, do not reference or use any code.
 2. If referencing code using a permissive license (ex: MIT, Apache 2.0, etc.), cite via a comment in relevant code file(s). This can be as simple as a URL since we will cite more.
 3. Create a full APA citation and attach to our senior design document bibliography.
-4. This last step is if you use/reference code, not necessarily for general help: include the license copyright in our GitHub Wiki section, in the relevant file.
+4. This last step is if you use/reference code, not necessarily for general help: include the license copyright in `licenses_references/`, in the relevant file.
 
 # Questions?
 Reach out to Quikks1lver; he's happy to help!
