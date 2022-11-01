@@ -3,8 +3,11 @@
 MIT License
 
 Copyright (c) 2016 Doug Moscrop
+
 Copyright (c) 2017 Serverless, Inc. http://www.serverless.com
+
 Copyright (c) 2018 Sebastián Ramírez
+
 Copyright (c) 2020 Jordan Eremieff
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
