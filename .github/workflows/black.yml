@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: s/ubuntu-latest/self-hosted/gi
     steps:
       - uses: actions/checkout@v2
       - uses: psf/black@stable
