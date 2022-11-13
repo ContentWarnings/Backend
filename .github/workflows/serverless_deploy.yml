@@ -19,7 +19,7 @@ on:
 jobs:
   deploy:
     name: deploy
-    runs-on: s/ubuntu-latest/self-hosted/gi
+    runs-on: self-hosted
     strategy:
       matrix:
         node-version: [16.x]
