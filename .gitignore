@@ -1,0 +1,6 @@
+.serverless/
+.vscode/
+.DS_Store
+
+# include your virtual environment folder here
+virtenv/

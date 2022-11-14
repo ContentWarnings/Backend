@@ -1,0 +1,40 @@
+# References
+# https://github.com/serverless/github-action
+#
+# as per Apache 2.0 License, we have put in comments any changes to codefile
+
+# changed to 'main' from 'master'
+name: Deploy main branch
+
+# modified 'on' conditions to reference new branch name ('main') and to filter on which
+# codefiles have been modified
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'serverless.yaml'
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install  # changed to 'install' from 'ci'
+    - name: serverless deploy
+      uses: serverless/github-action@v3.1
+      with:
+        args: deploy
+      env:
+        # removed line detailing serverless access key and uncommented secret keys
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
