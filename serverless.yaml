@@ -16,7 +16,7 @@ provider:
   stage: prod # change while on feature branches!
   apiGateway:
     apiKeys:
-      - secretKey1
+      - supaSecretKey
     usagePlan:
       quota:
         limit: 5000
