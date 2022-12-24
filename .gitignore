@@ -1,6 +1,8 @@
 .serverless/
 .vscode/
 .DS_Store
+node_modules
+package-lock.json
 
 # include your virtual environment folder here
 virtenv/

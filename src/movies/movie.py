@@ -1,11 +1,19 @@
 # References
 # https://fastapi.tiangolo.com/tutorial/bigger-applications/
 # https://github.com/serverless/examples/blob/v3/aws-python-flask-dynamodb-api/app.py
+# https://fastapi.tiangolo.com/tutorial/query-params/
+# https://stackoverflow.com/questions/37343369/is-there-a-way-to-sort-custom-objects-in-a-custom-way-in-python
+# https://docs.python.org/3/howto/sorting.html
 
-from fastapi import APIRouter
-import os
+from ..tmdb.tmdb import TMDB
+from ..tmdb.genres import Genre, GENRE_MAP
+from .MovieReduced import MovieReduced, MovieReducedFields
 import boto3
-import random
+from fastapi import APIRouter
+import json
+import os
+import requests
+from typing import List, Union
 
 movie_router = APIRouter()
 dynamodb_client = boto3.client("dynamodb")
@@ -13,27 +21,35 @@ dynamodb_client = boto3.client("dynamodb")
 MOVIES_TABLE = os.environ["MOVIES_TABLE"]
 
 
-@movie_router.get("/movies/")
-def movies_home():
-    return {"movies": "home!"}
+def get_trending_movies() -> requests.Response:
+    """
+    Returns trending movies from the last day, in JSON format
+    """
+    return TMDB.hit_api("trending/movie/day")
 
 
-@movie_router.post("/movies/post/{movie_name}")
-def post_movies(movie_name: str):
-    dynamodb_client.put_item(
-        TableName=MOVIES_TABLE,
-        Item={"movieName": {"S": movie_name}, "dummyData": {"S": str(random.random())}},
+@movie_router.get("/movies/get/")
+def search(
+    q: Union[str, None] = None,
+    p: int = 1,
+    sort: MovieReducedFields = MovieReducedFields.title,
+    genre: Genre = Genre.Disregard,
+):
+    response = (
+        get_trending_movies()
+        if q is None
+        else TMDB.hit_api("search/movie/", f"&query={q}&page={p}")
     )
 
+    json_map = json.loads(response.text)
 
-@movie_router.get("/movies/get/{movie_name}")
-def get_movie(movie_name: str):
-    result = dynamodb_client.get_item(
-        TableName=MOVIES_TABLE, Key={"movieName": {"S": movie_name}}
-    )
-    item = result.get("Item")
+    movies_list: List[MovieReduced] = []
+    for val in json_map["results"]:
+        if genre != Genre.Disregard:
+            if GENRE_MAP[genre] not in val["genre_ids"]:
+                continue
+        movies_list.append(MovieReduced.create(val))
 
-    if not item:
-        return {"error": "sorry"}
+    movies_list = sorted(movies_list, key=lambda o: o.jsonify()[sort.value])
 
-    return {"movie": str(item)}
+    return [val.jsonify() for val in movies_list]
