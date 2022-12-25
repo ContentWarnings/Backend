@@ -15,7 +15,7 @@ import os
 import requests
 from typing import List, Union
 
-movie_router = APIRouter()
+search_router = APIRouter()
 dynamodb_client = boto3.client("dynamodb")
 
 MOVIES_TABLE = os.environ["MOVIES_TABLE"]
@@ -28,7 +28,7 @@ def get_trending_movies() -> requests.Response:
     return TMDB.hit_api("trending/movie/day")
 
 
-@movie_router.get("/movies/get/")
+@search_router.get("/search")
 def search(
     q: Union[str, None] = None,
     p: int = 1,
