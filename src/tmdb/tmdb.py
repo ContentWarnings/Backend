@@ -8,7 +8,7 @@ import requests
 import os
 
 
-class TMDB():
+class TMDB:
     """
     Holds a bunch of methods to perform TMDB API operations
     """
