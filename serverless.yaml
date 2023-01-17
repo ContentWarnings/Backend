@@ -16,7 +16,7 @@ provider:
   stage: prod # change while on feature branches!
   apiGateway:
     apiKeys:
-      - supaSecretKey
+      - awsSecret # change while on feature branches!
     usagePlan:
       quota:
         limit: 5000
