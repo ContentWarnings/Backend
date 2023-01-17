@@ -6,3 +6,4 @@ package-lock.json
 
 # include your virtual environment folder here
 virtenv/
+venv/

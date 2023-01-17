@@ -7,10 +7,35 @@ This is the home for our Python/FastAPI AWS backend for senior design. Please re
 - Install [Python](https://www.python.org/).
 - Install [Serverless Framework](https://www.serverless.com/).
 
+```sh
+# Install dependencies (Debian-likes)
+sudo apt-get install python3.8 python3.8-venv
+
+# Install Serverless CLI
+npm install -g serverless
+```
+
+
 ## Dev Environment Setup
 1. Clone repository.
 2. Set up a Python virtual environment and install modules from `requirements.txt`.
 3. Set up Serverless CLI with AWS credentials (ask Quikks1lver for credentials).
+
+```sh
+# Clone repository
+git clone git@github.com:ContentWarnings/Backend.git
+cd Backend
+
+# Configure venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+python3 -m pip install -r requirements.txt
+
+# Configure Serverless with AWS keys
+serverless config credentials --provider aws --key <aws_key> --secret <aws_secret>
+```
 
 # How to Contribute
 1. Create a new feature branch using your name. Example: `adam/bug-fix`.
@@ -22,6 +47,22 @@ This is the home for our Python/FastAPI AWS backend for senior design. Please re
 7. Submit a pull request (PR), and ensure any testing/formatting pipelines pass. Fill out PR template fully, attaching images if necessary to help your reviewers.
 8. Respond to other teammate's comments and merge in when approved.
 9. Delete your feature branch (should automatically do so on GitHub), and start the process over again for new changes.
+
+```sh
+# Create new branch
+git checkout -B adam/bug-fix
+
+# Enter venv
+source venv/bin/activate
+
+# Run Black to make sure formatting is compliant.
+black src/*
+
+# Push to Git.
+git add .
+git commit -m "Push bug fix"
+git push origin adam/bug-fix
+```
 
 # Citation Guide
 
