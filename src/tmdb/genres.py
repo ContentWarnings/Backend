@@ -32,7 +32,9 @@ class Genre(str, Enum):
     Disregard = "Disregard"  # when we don't care about genre
 
 
-# Maps genres to their TMDB ID
+"""
+Maps genres to their TMDB ID
+"""
 GENRE_MAP: Dict[Genre, int] = {
     Genre.Action: 28,
     Genre.Adventure: 12,

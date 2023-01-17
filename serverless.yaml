@@ -16,7 +16,7 @@ provider:
   stage: prod # change while on feature branches!
   apiGateway:
     apiKeys:
-      - supaDupaSecretKey # change while on feature branches!
+      - awsSecret # change while on feature branches!
     usagePlan:
       quota:
         limit: 5000
@@ -58,7 +58,7 @@ custom:
   pythonRequirements:
     dockerizePip: false
     pythonBin: python3
-  tableName: 'the-movies-table-${self:provider.stage}' # change while on feature branches!
+  tableName: 'the-movies-table-${self:provider.stage}'
 
 package:
   exclude:
