@@ -4,10 +4,11 @@
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.delete_item
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/customizations/dynamodb.html#ref-valid-dynamodb-types
 
+from fastapi import status
 from ..cw.ContentWarning import ContentWarning
 import boto3
 import os
-from typing import Dict, Union
+from typing import Dict, Tuple, Union
 
 
 class ContentWarningTable:
@@ -52,9 +53,16 @@ class ContentWarningTable:
         )
 
     @staticmethod
-    def add_warning(cw: ContentWarning) -> Union[ContentWarning, Dict[str, str]]:
+    def add_warning(cw: ContentWarning) -> Union[ContentWarning, Tuple[int, str]]:
+        """
+        Attempts to add specified content warning to table.
+        If fails, returns tuple of HTTP status error and detail
+        """
         if ContentWarningTable.get_warning(cw.id) is not None:
-            return {"error": f"CW with specified id {cw.id} already exists"}
+            return (
+                status.HTTP_409_CONFLICT,
+                f"CW with specified id {cw.id} already exists",
+            )
         ContentWarningTable.DYNAMO_DB_CLIENT.put_item(
             TableName=ContentWarningTable.CW_TABLE,
             Item=ContentWarningTable.__itemize_ContentWarning_to_db_entry(cw),
@@ -62,21 +70,26 @@ class ContentWarningTable:
         return cw
 
     @staticmethod
-    def edit_warning(cw: ContentWarning) -> Union[ContentWarning, Dict[str, str]]:
+    def edit_warning(cw: ContentWarning) -> Union[ContentWarning, Tuple[int, str]]:
+        """
+        Attempts to edit specified content warning.
+        If fails, returns tuple of HTTP status error and detail
+        """
         content_warning = ContentWarningTable.get_warning(cw.id)
 
         # check that the ID backed by the cw exists first
         if content_warning is None:
-            return {
-                "error": f"CW with specified id {cw.id} does not exist. Cannot edit."
-            }
+            return (
+                status.HTTP_404_NOT_FOUND,
+                f"CW with specified id {cw.id} does not exist. Cannot edit.",
+            )
 
         # if new warning changes link to movie, we should abort (our databases will get mixed up)
         if content_warning.movie_id != cw.movie_id:
             print(
                 f"Incoming CW {cw.id} is linked to a different movie ({cw.movie_id}), not current movie ({content_warning.movie_id}). Abort."
             )
-            return {"error": "Clashing incoming/existing movie ids"}
+            return (status.HTTP_409_CONFLICT, "Clashing incoming/existing movie ids")
 
         ContentWarningTable.DYNAMO_DB_CLIENT.put_item(
             TableName=ContentWarningTable.CW_TABLE,
