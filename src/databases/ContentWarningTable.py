@@ -73,8 +73,9 @@ class ContentWarningTable:
 
         # if new warning changes link to movie, we should abort (our databases will get mixed up)
         if content_warning.movie_id != cw.movie_id:
+            print(f"Incoming CW {cw.id} is linked to a different movie ({cw.movie_id}), not current movie ({content_warning.movie_id}). Abort.")
             return {
-                "error": f"Incoming CW {cw.id} is linked to a different movie ({cw.movie_id}), not current movie ({content_warning.movie_id}). Abort."
+                "error": "Clashing incoming/existing movie ids"
             }
 
         ContentWarningTable.DYNAMO_DB_CLIENT.put_item(

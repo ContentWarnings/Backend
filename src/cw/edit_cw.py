@@ -17,7 +17,7 @@ def edit_cw(
     cw = ContentWarningTable.get_warning(cw_id)
     if cw is None:
         response.status_code = status.HTTP_404_NOT_FOUND
-        return {"no cw exists with id": cw_id}
+        return {"error": f"no cw exists with id {cw_id}"}
 
     # if JSON body is passed in empty, we are to delete cw from CW table and
     # movies table, returning appropriate JSON on results
