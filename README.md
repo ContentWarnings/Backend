@@ -40,11 +40,29 @@ serverless config credentials --provider aws --key <aws_key> --secret <aws_secre
 # How to Contribute
 1. Create a new feature branch using your name. Example: `adam/bug-fix`.
 2. Make relevant code changes in `src/`.
-3. **Very important:** Test your code by spinning up the AWS resources in your testing stage! To do so, open `serverless.yaml`, and edit `stage`. Example: `adam-dev`. To deploy your changes, run `sls deploy`. Remember to remove your stage's name and replace with `prod` prior to a pull request.
+3. **Very important:** Test your code by spinning up the AWS resources in your testing stage! To do so, open `serverless.yaml`, and edit names for `stage`, DynamoDB tables, and `apiKey`. To deploy your changes, run `sls deploy`. Remember to revert `yaml` changes prior to PR.
 4. Ensure you run the `black` command to format code prior to attempting a merge.
-5. Submit a pull request (PR), and ensure any testing/formatting pipelines pass. Fill out PR template fully, attaching images if necessary to help your reviewers.
-6. Respond to other teammate's comments and merge in when approved.
-7. Delete your feature branch (should automatically do so on GitHub), and start the process over again for new changes.
+5. Add any new modules to `requirements.txt`.
+6. Cite your sources! (see guide below)
+7. Submit a pull request (PR), and ensure any testing/formatting pipelines pass. Fill out PR template fully, attaching images if necessary to help your reviewers.
+8. Respond to other teammate's comments and merge in when approved.
+9. Delete your feature branch (should automatically do so on GitHub), and start the process over again for new changes.
+
+```sh
+# Create new branch
+git checkout -B adam/bug-fix
+
+# Enter venv
+source venv/bin/activate
+
+# Run Black to make sure formatting is compliant.
+black src/*
+
+# Push to Git.
+git add .
+git commit -m "Push bug fix"
+git push origin adam/bug-fix
+```
 
 ```sh
 # Create new branch

@@ -11,4 +11,4 @@ jobs:
     steps:
       - uses: ShiftLeftSecurity/scan-action@master
         with:
-            type: "credscan,java,depscan"
+            type: "credscan,python,depscan"
