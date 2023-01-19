@@ -8,8 +8,10 @@ package-lock.json
 
 # Files containing secrets
 .env
-serverless.yml
 
 # include your virtual environment folder here
 virtenv/
 venv/
+
+# References (internal per-person doc)
+divi_references.txt
