@@ -68,22 +68,6 @@ git commit -m "Push bug fix"
 git push origin adam/bug-fix
 ```
 
-```sh
-# Create new branch
-git checkout -B adam/bug-fix
-
-# Enter venv
-source venv/bin/activate
-
-# Run Black to make sure formatting is compliant.
-black src/*
-
-# Push to Git.
-git add .
-git commit -m "Push bug fix"
-git push origin adam/bug-fix
-```
-
 # Citation Guide
 
 1. Ask yourself if the resource can be cited at all. If the resource is a tutorial, you can implicitly use the technique, but without a license, do not reference or use any code.
