@@ -8,7 +8,7 @@ package-lock.json
 
 # Files containing secrets
 .env
-serverless.yaml
+serverless.yml
 
 # include your virtual environment folder here
 virtenv/
