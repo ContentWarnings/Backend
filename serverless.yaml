@@ -34,13 +34,19 @@ provider:
             - dynamodb:GetItem
             - dynamodb:PutItem
             - dynamodb:DeleteItem
+            - lambda:InvokeFunction
           # allows this resource to be modified on sls deploy.
           Resource:
+            - arn:aws:lambda:us-east-1:*:*
             - Fn::GetAtt: [MoviesTable, Arn]
             - Fn::GetAtt: [CWTable, Arn]
+            - Fn::GetAtt: [UserVerificationTable, Arn]
+            - Fn::GetAtt: [UserTable, Arn]
   environment:
     MOVIES_TABLE: ${self:custom.movieTableName}
     CW_TABLE: ${self:custom.cwTableName}
+    USER_VERIFICATION_TABLE: ${self:custom.userVerificationTableName}
+    USER_TABLE: ${self:custom.userTableName}
 
 # REST API (gives more functionality than HTTP API)
 # to change to an HTTP API, simply replace "http" with "httpApi: '*'"
@@ -63,6 +69,8 @@ custom:
     pythonBin: python3
   movieTableName: 'the-movies-table-${self:provider.stage}'
   cwTableName: 'the-cw-table-${self:provider.stage}'
+  userVerificationTableName: 'the-user-verification-table-${self:provider.stage}'
+  userTableName: 'the-user-table-${self:provider.stage}'
 
 package:
   exclude:
@@ -101,3 +109,29 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.cwTableName}
+    UserVerificationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.userVerificationTableName}
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.userTableName}
