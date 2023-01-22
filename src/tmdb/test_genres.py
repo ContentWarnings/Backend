@@ -22,12 +22,16 @@ def test_genres():
     assert Genre.Music == "Music", "Invalid genre string for: Music"
     assert Genre.Mystery == "Mystery", "Invalid genre string for: Mystery"
     assert Genre.Romance == "Romance", "Invalid genre string for: Romance"
-    assert Genre.Science_Fiction == "Science Fiction", "Invalid genre string for: Science_Fiction"
+    assert (
+        Genre.Science_Fiction == "Science Fiction"
+    ), "Invalid genre string for: Science_Fiction"
     assert Genre.TV_Movie == "TV Movie", "Invalid genre string for: TV_Movie"
     assert Genre.Thriller == "Thriller", "Invalid genre string for: Thriller"
     assert Genre.War == "War", "Invalid genre string for: War"
     assert Genre.Western == "Western", "Invalid genre string for: Western"
-    assert Genre.Disregard == "Disregard", "Invalid genre string for: Disregard"  # when we don't care about genre
+    assert (
+        Genre.Disregard == "Disregard"
+    ), "Invalid genre string for: Disregard"  # when we don't care about genre
 
 
 def test_genre_map():
@@ -39,7 +43,9 @@ def test_genre_map():
     assert GENRE_MAP.get(Genre.Animation) == 16, "Invalid genre mapping for: Animation"
     assert GENRE_MAP.get(Genre.Comedy) == 35, "Invalid genre mapping for: Comedy"
     assert GENRE_MAP.get(Genre.Crime) == 80, "Invalid genre mapping for: Crime"
-    assert GENRE_MAP.get(Genre.Documentary) == 99, "Invalid genre mapping for: Documentary"
+    assert (
+        GENRE_MAP.get(Genre.Documentary) == 99
+    ), "Invalid genre mapping for: Documentary"
     assert GENRE_MAP.get(Genre.Drama) == 18, "Invalid genre mapping for: Drama"
     assert GENRE_MAP.get(Genre.Family) == 10751, "Invalid genre mapping for: Family"
     assert GENRE_MAP.get(Genre.Fantasy) == 14, "Invalid genre mapping for: Fantasy"
@@ -48,7 +54,9 @@ def test_genre_map():
     assert GENRE_MAP.get(Genre.Music) == 10402, "Invalid genre mapping for: Music"
     assert GENRE_MAP.get(Genre.Mystery) == 9648, "Invalid genre mapping for: Mystery"
     assert GENRE_MAP.get(Genre.Romance) == 10749, "Invalid genre mapping for: Romance"
-    assert GENRE_MAP.get(Genre.Science_Fiction) == 878, "Invalid genre mapping for: Science_Fiction"
+    assert (
+        GENRE_MAP.get(Genre.Science_Fiction) == 878
+    ), "Invalid genre mapping for: Science_Fiction"
     assert GENRE_MAP.get(Genre.TV_Movie) == 10770, "Invalid genre mapping for: TV_Movie"
     assert GENRE_MAP.get(Genre.Thriller) == 53, "Invalid genre mapping for: Thriller"
     assert GENRE_MAP.get(Genre.War) == 10752, "Invalid genre mapping for: War"
