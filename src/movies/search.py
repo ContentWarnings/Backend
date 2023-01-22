@@ -52,4 +52,4 @@ def search(
 
     movies_list = sorted(movies_list, key=lambda o: o.jsonify()[sort.value])
 
-    return [val.jsonify() for val in movies_list]
+    return {"result": [val.jsonify() for val in movies_list]}
