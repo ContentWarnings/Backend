@@ -11,7 +11,7 @@ app.include_router(search.search_router)
 
 @app.get("/")
 def hello():
-    return {"msg": "Hello, world!"}
+    return {"response": "Hello, world!"}
 
 
 # routes any requests to appropriate endpoint

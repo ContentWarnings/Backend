@@ -15,7 +15,7 @@ def test_hello_world():
     """
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"msg": "Hello, world!"}
+    assert response.json() == {"response": "Hello, world!"}
 
 
 def test_env_variables():

@@ -45,13 +45,18 @@ class TMDB:
         if not response.ok:
             return "Unknown"
 
-        results = json.loads(response.text)["release_dates"]["results"]
+        results = TMDB.jsonify_response(response).get("release_dates").get("results")
 
         rating = "Unknown"
         for item in results:
             if item["iso_3166_1"] == "US":
                 try:
-                    rating = item["release_dates"][0]["certification"]
+                    # Sometimes, there can be multiple releases per region.
+                    # Example: 76600 (Avatar: The Way of Water)
+                    for release in item["release_dates"]:
+                        if release["certification"] != "":
+                            rating = release["certification"]
+                            break
                 except Exception:
                     pass
                 break
