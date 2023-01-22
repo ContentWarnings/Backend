@@ -107,8 +107,6 @@ def test_get_search_genre():
     assert data_json != None, "GET /search?q&genre: No response if q set.."
     assert data_json != {}, "GET /search?q&genre: Empty response if q set.."
 
-    assert False, data_json
-
     assert (
         data_json.get("results", None) != None
     ), "GET /search?q: Expected key 'results' is missing"
