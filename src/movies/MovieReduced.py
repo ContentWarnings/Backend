@@ -2,6 +2,7 @@
 # https://fastapi.tiangolo.com/tutorial/response-model/
 # https://www.themoviedb.org/talk/5f3ef4eec175b200365ee352
 
+from .PosterPath import PosterPath
 from ..tmdb.tmdb import TMDB
 from enum import Enum
 from pydantic import BaseModel
@@ -33,11 +34,15 @@ class MovieReduced(BaseModel):
             mpa = TMDB.get_mpa_rating(id)
             return "Unknown" if mpa == "" else mpa
 
+        image = get_val("poster_path")
+        if image != UNKNOWN:
+            image = PosterPath.create_poster_link(image)
+
         return MovieReduced(
             id=int(json_map["id"]),
             title=get_val("title"),
             release=get_val("release_date"),
-            img=get_val("poster_path"),
+            img=image,
             mpa=get_mpa(json_map["id"]),
             rating=float(json_map.get("vote_average", -1)),
         )
