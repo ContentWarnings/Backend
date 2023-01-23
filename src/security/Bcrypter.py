@@ -40,7 +40,7 @@ class Bcrypter:
         return response["Payload"].read()
 
     @staticmethod
-    def encrypt_password(password: str) -> str:
+    def hash_password(password: str) -> str:
         return str(
             Bcrypter.__invoke_security_lambda(hash=True, password=password),
             encoding="utf-8",

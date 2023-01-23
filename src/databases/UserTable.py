@@ -58,8 +58,8 @@ class UserTable:
                 f"User with specified email {user_reduced.email} already exists.",
             )
 
-        # encrypt user passwords before placing inside db
-        user_reduced.password = Bcrypter.encrypt_password(user_reduced.password)
+        # hash user passwords before placing inside db
+        user_reduced.password = Bcrypter.hash_password(user_reduced.password)
 
         UserTable.DYNAMO_DB_CLIENT.put_item(
             TableName=UserTable.USER_TABLE,

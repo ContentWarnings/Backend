@@ -23,7 +23,7 @@ def verify_user(email: str, code: str):
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with email {email} does not exist in database.",
+            detail=f"User does not exist or password does not match.",
         )
 
     # if user is already verified, we're done
