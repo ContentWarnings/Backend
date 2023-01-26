@@ -1,3 +1,4 @@
+from .PosterPath import PosterPath
 from ..databases.MovieTable import MovieTable
 from ..cw.ContentWarning import ContentWarningReduced
 from .MovieReduced import MovieReduced
@@ -92,7 +93,11 @@ class MovieFull(BaseModel):
         # explicitly cast rating to float in case it's an integer value, or pydantic complains
         movie_full_fields["rating"] = float(movie_full_fields["rating"])
 
-        # TODO: add prefix to poster paths
+        # add prefix to poster paths
+        for k in ["img", "backdrop"]:
+            if movie_full_fields[k] is None or movie_full_fields[k] == "":
+                continue
+            movie_full_fields[k] = PosterPath.create_poster_link(movie_full_fields[k])
 
         # pydantic complains if fields are null
         for k, v in MovieFull.__fields__.items():
