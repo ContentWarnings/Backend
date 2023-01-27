@@ -33,11 +33,20 @@ provider:
             - dynamodb:Query
             - dynamodb:GetItem
             - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - lambda:InvokeFunction
           # allows this resource to be modified on sls deploy.
           Resource:
+            - arn:aws:lambda:us-east-1:*:*
             - Fn::GetAtt: [MoviesTable, Arn]
+            - Fn::GetAtt: [CWTable, Arn]
+            - Fn::GetAtt: [UserVerificationTable, Arn]
+            - Fn::GetAtt: [UserTable, Arn]
   environment:
-    MOVIES_TABLE: ${self:custom.tableName}
+    MOVIES_TABLE: ${self:custom.movieTableName}
+    CW_TABLE: ${self:custom.cwTableName}
+    USER_VERIFICATION_TABLE: ${self:custom.userVerificationTableName}
+    USER_TABLE: ${self:custom.userTableName}
 
 # REST API (gives more functionality than HTTP API)
 # to change to an HTTP API, simply replace "http" with "httpApi: '*'"
@@ -58,7 +67,10 @@ custom:
   pythonRequirements:
     dockerizePip: false
     pythonBin: python3
-  tableName: 'the-movies-table-${self:provider.stage}'
+  movieTableName: 'the-movies-table-${self:provider.stage}'
+  cwTableName: 'the-cw-table-${self:provider.stage}'
+  userVerificationTableName: 'the-user-verification-table-${self:provider.stage}'
+  userTableName: 'the-user-table-${self:provider.stage}'
 
 package:
   exclude:
@@ -75,12 +87,51 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: movieName
-            AttributeType: S
+          - AttributeName: id
+            AttributeType: N
         KeySchema:
-          - AttributeName: movieName
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.movieTableName}
+    CWTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.cwTableName}
+    UserVerificationTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.userVerificationTableName}
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.userTableName}
