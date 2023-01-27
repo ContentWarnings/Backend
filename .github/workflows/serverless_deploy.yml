@@ -1,5 +1,7 @@
 # References
 # https://github.com/serverless/github-action
+# https://dev.to/jakewitcher/using-env-files-for-environment-variables-in-python-applications-55a1
+# https://www.thisdot.co/blog/github-actions-for-serverless-framework-deployments
 #
 # as per Apache 2.0 License, we have put in comments any changes to codefile
 
@@ -30,6 +32,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install  # changed to 'install' from 'ci'
+    - name: create .env file # added this step to create a .env file
+      run: |
+        touch .env
+        echo TMDB_API_KEY=${{ secrets.TMDB_API_KEY }} >> .env
     - name: serverless deploy
       uses: serverless/github-action@v3.1
       with:

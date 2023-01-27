@@ -2,7 +2,9 @@
 # https://stackoverflow.com/questions/4528099/convert-json-string-to-dict-using-python
 # https://medium.datadriveninvestor.com/accessing-github-secrets-in-python-d3e758d8089b
 # https://www.themoviedb.org/talk/5d588e585cc11d00125ff1f1
+# https://pypi.org/project/python-dotenv/
 
+from dotenv import load_dotenv
 import json
 import requests
 import os
@@ -13,6 +15,8 @@ class TMDB:
     Holds a bunch of methods to perform TMDB API operations
     """
 
+    # load environment variable file and key
+    load_dotenv()
     __TMDB_API_KEY = os.environ["TMDB_API_KEY"]
 
     @staticmethod
