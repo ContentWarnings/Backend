@@ -19,6 +19,22 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Write AWS secrets to ~/.aws
+        run: |
+          echo "[default]
+          aws_access_key_id=$AWS_ACCESS_KEY_ID
+          aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" > ~/.aws/credentials
+      - name: Write AWS config to ~/.aws
+        run: |
+          echo "[default]
+          region=us-east-1
+          output=json" > ~/.aws/config
+
+      # Change this every time we need a new env variable.
+      - name: Expose relevant env variables
+        run: export MOVIES_TABLE=the-movies-table-dev
+
       - name: Install project dependencies
         run: pip install -r requirements.txt
       - name: Install GitHub Action dependencies
