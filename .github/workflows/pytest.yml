@@ -33,7 +33,11 @@ jobs:
 
       # Change this every time we need a new env variable.
       - name: Expose relevant env variables
-        run: export MOVIES_TABLE=the-movies-table-dev
+        run: |
+          export MOVIES_TABLE=the-movies-table-dev; 
+          export CW_TABLE=the-cw-table-dev;
+          export USER_VERIFICATION_TABLE=the-user-verification-dev;
+          export USER_TABLE=the-user-table-dev;
 
       - name: Install project dependencies
         run: pip install -r requirements.txt
