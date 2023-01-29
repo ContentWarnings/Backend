@@ -82,22 +82,38 @@ def test_post_movie():
         "name": "Gun Violence",
         "time": [120, 270],
         "movie_id": 42069,
-        "desc": "This is a placeholder content warning for testing purposes."
+        "desc": "This is a placeholder content warning for testing purposes.",
     }
 
     data = client.post("/movie/76600", json=cw_data)
     print(data.json())
-    
+
     # 3. see if CW was added properly
     data_fin = client.get("/movie/76600").json()  # Avatar 2
-    assert cw_count + 1 == len(data_fin.get("cw", [])), "POST /movie/<id>: New content warning was not appended to the database."
+    assert cw_count + 1 == len(
+        data_fin.get("cw", [])
+    ), "POST /movie/<id>: New content warning was not appended to the database."
 
     pulled_cw_data = data_fin.get("cw")[cw_count]
 
-    assert pulled_cw_data != None and pulled_cw_data != {}, "POST /movie/<id>: New content warning was appended blank."
+    assert (
+        pulled_cw_data != None and pulled_cw_data != {}
+    ), "POST /movie/<id>: New content warning was appended blank."
 
-    assert pulled_cw_data.get("name") == "Gun Violence", "POST /movie/<id>: Content warning added with incorrect classification."
-    assert pulled_cw_data.get("movie_id") != 42069, "POST /movie/<id>: Movie ID was tampered with on addition (expected 76600, got 42069)."
-    assert pulled_cw_data.get("movie_id") == 76600, f"POST /movie/<id>: Movie ID was appended incorrectly (expected 76600, got {pulled_cw_data.get('movie_id')})."
-    assert pulled_cw_data.get("desc") == "This is a placeholder content warning for testing purposes.", "POST /movie/<id>: CW description added with incorrect description."
-    assert pulled_cw_data.get("time") == [120, 270], "POST /movie/<id>: Timestamp tuple-like was added incorrectly."
+    assert (
+        pulled_cw_data.get("name") == "Gun Violence"
+    ), "POST /movie/<id>: Content warning added with incorrect classification."
+    assert (
+        pulled_cw_data.get("movie_id") != 42069
+    ), "POST /movie/<id>: Movie ID was tampered with on addition (expected 76600, got 42069)."
+    assert (
+        pulled_cw_data.get("movie_id") == 76600
+    ), f"POST /movie/<id>: Movie ID was appended incorrectly (expected 76600, got {pulled_cw_data.get('movie_id')})."
+    assert (
+        pulled_cw_data.get("desc")
+        == "This is a placeholder content warning for testing purposes."
+    ), "POST /movie/<id>: CW description added with incorrect description."
+    assert pulled_cw_data.get("time") == [
+        120,
+        270,
+    ], "POST /movie/<id>: Timestamp tuple-like was added incorrectly."
