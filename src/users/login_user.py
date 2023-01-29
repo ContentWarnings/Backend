@@ -1,3 +1,4 @@
+from ..security.JWT import JWT
 from ..users.User import UserReduced
 from ..databases.UserTable import UserTable
 from ..security.Bcrypter import Bcrypter
@@ -28,5 +29,4 @@ def login_user(incoming_user: UserReduced):
             detail="User does not exist or password does not match.",
         )
 
-    # TODO: return JWT instead of user info
-    return user.jsonify()
+    return {"result": JWT.create_encoded_jwt(incoming_user.email)}

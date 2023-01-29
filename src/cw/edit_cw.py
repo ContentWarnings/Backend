@@ -4,17 +4,40 @@
 
 from ..databases.MovieTable import MovieTable
 from ..databases.ContentWarningTable import ContentWarningTable
+from ..databases.UserTable import UserTable
+from ..security.Authentication import Authentication
+from ..security.JWT import JWT
 from .ContentWarning import ContentWarningReduced, Nothing
-from fastapi import APIRouter, status, HTTPException
-from typing import Union
+from fastapi import APIRouter, Depends, Request, status, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from typing import Optional, Union
 
 edit_cw_router = APIRouter()
+oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @edit_cw_router.post("/cw/{cw_id}")
-def edit_cw(
-    cw_id: str, root: Union[ContentWarningReduced, Nothing]
+@Authentication.member
+async def edit_cw(
+    request: Request,
+    token: Optional[str] = Depends(oath2_scheme),
+    cw_id: str = None,
+    root: Union[ContentWarningReduced, Nothing] = None,
 ) -> ContentWarningReduced:
+    if cw_id is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No cw id given.")
+
+    if root is None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="No cw given for editing."
+        )
+
+    if type(root) is ContentWarningReduced and cw_id != root.id:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"CW endpoint id {cw_id} != CW object id {root.id}",
+        )
+
     cw = ContentWarningTable.get_warning(cw_id)
     if cw is None:
         raise HTTPException(
@@ -22,12 +45,16 @@ def edit_cw(
             detail=f"no cw exists with id {cw_id}",
         )
 
-    # if JSON body is passed in empty, we are to delete cw from CW table and
-    # movies table, returning appropriate JSON on results
+    # if JSON body is passed in empty, we are to delete cw from CW table,
+    # movies table, and user table, returning appropriate JSON on results
     if type(root) is Nothing:
         res1 = MovieTable.delete_warning_from_movie(cw.movie_id, cw.id)
         res2 = ContentWarningTable.delete_warning(cw_id)
+        res3 = UserTable.delete_cw(JWT.get_email(token), cw_id)
+
         res1.update(res2)
+        res1.update(res3)
+
         return res1
 
     # if JSON body is a valid cw, we edit it

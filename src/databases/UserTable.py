@@ -3,7 +3,7 @@ from ..users.User import User, UserReduced
 import boto3
 from fastapi import status
 import os
-from typing import Tuple, Union
+from typing import Dict, Tuple, Union
 
 
 class UserTable:
@@ -78,3 +78,34 @@ class UserTable:
             TableName=UserTable.USER_TABLE,
             Item=UserTable.__itemize_User_to_db_entry(user),
         )
+
+    @staticmethod
+    def edit_user(user: User):
+        """
+        Edits existing user inside table
+        """
+        UserTable.DYNAMO_DB_CLIENT.put_item(
+            TableName=UserTable.USER_TABLE,
+            Item=UserTable.__itemize_User_to_db_entry(user),
+        )
+
+    @staticmethod
+    def delete_cw(user_email: str, cw_id: str) -> Dict[str, str]:
+        """
+        Deletes specified CW from user
+        """
+        user = UserTable.get_user(user_email)
+        if user is None:
+            return {"no user with email": user_email}
+
+        if cw_id in user.contributions:
+            user.contributions.remove(cw_id)
+        else:
+            return {f"user {user_email} does not have contribution with id": cw_id}
+
+        UserTable.DYNAMO_DB_CLIENT.put_item(
+            TableName=UserTable.USER_TABLE,
+            Item=UserTable.__itemize_User_to_db_entry(user),
+        )
+
+        return {f"deleted cw {cw_id} from user": user_email}
