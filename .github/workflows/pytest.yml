@@ -16,8 +16,16 @@ jobs:
       #   uses: actions/setup-python@v4
       #   with:
       #     python-version: ${{ matrix.python-version }}
-      - name: "Set up Python 3.8"
-        run: "sudo apt install -y python3.8 python3.8-pip"
+      - name: Compile Python 3.8"
+        run: |
+          sudo apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev
+          curl -O https://www.python.org/ftp/python/3.8.16/Python-3.8.16.tar.xz
+          tar -xf Python-3.8.16.tar.xz
+          cd Python-3.8.16
+          ./configure --enable-optimizations
+          make -j 4
+          make install
+
 
       - name: Write AWS secrets to ~/.aws
         run: |
