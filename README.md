@@ -68,6 +68,14 @@ git commit -m "Push bug fix"
 git push origin adam/bug-fix
 ```
 
+## Local Development Guide
+
+```sh
+# (in project root)
+python3 -m pip install gunicorn
+python3 -m gunicorn src.main:app --worker-class uvicorn.workers.UvicornWorker
+```
+
 # Citation Guide
 
 1. Ask yourself if the resource can be cited at all. If the resource is a tutorial, you can implicitly use the technique, but without a license, do not reference or use any code.
