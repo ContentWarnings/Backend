@@ -45,6 +45,10 @@ jobs:
           export CW_TABLE=the-cw-table-dev;
           export USER_VERIFICATION_TABLE=the-user-verification-dev;
           export USER_TABLE=the-user-table-dev;
+          export JWT_SECRET=DO_NOT_USE_IN_PRODUCTION_lop1siIesrkf6ZL90OVOF1vRzljbTziqC79onSaKgrIqGDXrwZPZ1s1V9ODkqehCPzyb9fKbFuDkSUlNhaNWHZRFIMafc5MToUxJLLx83JVHTOfamhhXIRiAw7D0rcpeuTZJVekWeVGjntR4RX8FhzP3LFOrIVGC7gfJFAm5DptyB0MJNZ2gKnbIxCafUbmAxUrpEEre9pN34gfaw8jCM8EGQK3ng5OQv21E4r2aGTvWc9L1NmZ3bEaWx73n4wya6fxNQnUqj5pNbi982keQ9UzDfquSdy4lfXewecA5lYRmB6m649QsAS0mxRoZ91CvXgHSbGd0fbpvVAxqXNpMB6F0SVkMuQ158XYr7PbMqsZgDFElQjde9w8Cwnvuj3vG7g5jQobI7xBKueydVOY6vQR5wqHFdtekcuory6zsZM1yE2qoauimD4I6Y6eOqkuC7fkM8PTp2skD4hrKIimwTH83HSJETzb5nT
+          export JWT_ALGORITHM=HS256
+          export JWT_SUDO_LIFETIME=86400
+          export JWT_USER_LIFETIME=604800
 
       - name: Install project dependencies
         run: pip install -r requirements.txt
