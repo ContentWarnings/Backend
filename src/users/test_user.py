@@ -131,9 +131,7 @@ def test_everything_user_related_that_requires_a_login():
     ), "POST /auth/login: Password illicitly weakened (token received)."
 
     # POST /user (good password)
-    password_tweaks = {
-        "password": "HereIsAnotherGoodPasswordWeShouldUse_98109!"
-    }
+    password_tweaks = {"password": "HereIsAnotherGoodPasswordWeShouldUse_98109!"}
     successful_login_data = client.post("/auth/login", json=new_creds)
     new_creds = {
         "email": creds.get("email"),
@@ -146,4 +144,4 @@ def test_everything_user_related_that_requires_a_login():
         successful_login_data.get("token", "") != ""
     ), "POST /auth/login: Password was not changed (token empty or not set)."
 
-    # TODO: Delete user 
+    # TODO: Delete user
