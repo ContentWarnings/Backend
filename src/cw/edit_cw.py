@@ -25,24 +25,24 @@ async def edit_cw(
     root: Union[ContentWarningReduced, Nothing] = None,
 ) -> ContentWarningReduced:
     if cw_id is None:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No cw id given.")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No CW ID given.")
 
     if root is None:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, detail="No cw given for editing."
+            status.HTTP_400_BAD_REQUEST, detail="No CW given for editing."
         )
 
     if type(root) is ContentWarningReduced and cw_id != root.id:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
-            detail=f"CW endpoint id {cw_id} != CW object id {root.id}",
+            detail=f"CW endpoint ID {cw_id} != CW object ID {root.id}",
         )
 
     cw = ContentWarningTable.get_warning(cw_id)
     if cw is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"no cw exists with id {cw_id}",
+            detail=f"no CW exists with ID {cw_id}",
         )
 
     # if JSON body is passed in empty, we are to delete cw from CW table,
@@ -50,7 +50,14 @@ async def edit_cw(
     if type(root) is Nothing:
         res1 = MovieTable.delete_warning_from_movie(cw.movie_id, cw.id)
         res2 = ContentWarningTable.delete_warning(cw_id)
-        res3 = UserTable.delete_cw(JWT.get_email(token), cw_id)
+
+        email = JWT.get_email(token)
+        if email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User does not exist or invalid session token.",
+            )
+        res3 = UserTable.delete_cw(email, cw_id)
 
         res1.update(res2)
         res1.update(res3)

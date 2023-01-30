@@ -47,7 +47,7 @@ class Authentication:
             if time.time() > creation_date + Options.get_sudo_lifetime():
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Session not new enough to verify admin status. Unlike normal log-in, non-bot sudoer sessions only last a day.",
+                    detail="Session not new enough to verify admin status.",
                 )
 
             return await func(request, token, *args, **kwargs)
@@ -83,7 +83,7 @@ class Authentication:
             if time.time() > creation_date + Options.get_user_lifetime():
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Session expired. Sessions last for about fifteen weeks.",
+                    detail="Session expired.",
                 )
 
             return await func(request, token, *args, **kwargs)

@@ -29,4 +29,4 @@ def login_user(incoming_user: UserReduced):
             detail="User does not exist or password does not match.",
         )
 
-    return {"result": JWT.create_encoded_jwt(incoming_user.email)}
+    return {"token": JWT.create_encoded_jwt(incoming_user.email)}

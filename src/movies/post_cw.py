@@ -41,7 +41,7 @@ async def post_cw(
     if id != root.movie_id:
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"CW movie id {root.movie_id} != endpoint movie id {id}",
+            detail=f"CW movie ID {root.movie_id} != endpoint movie ID {id}",
         )
 
     # add cw to CW table
@@ -50,10 +50,17 @@ async def post_cw(
         raise HTTPException(status_code=result[0], detail=result[1])
 
     # add cw UUID to user object
-    user = UserTable.get_user(JWT.get_email(token))
+    email = JWT.get_email(token)
+    if email is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User does not exist or invalid session token.",
+        )
+    user = UserTable.get_user(email)
     if user is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Invalid user email."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User does not exist or invalid session token.",
         )
     user.contributions.append(root.id)
     UserTable.edit_user(user)

@@ -4,6 +4,7 @@
 
 import time
 from jose import jwt
+from typing import Union
 
 from .util.options import Options
 
@@ -28,14 +29,16 @@ class JWT:
         )
 
     @staticmethod
-    def get_email(encoded_jwt: str) -> str:
+    def get_email(encoded_jwt: str) -> Union[str, None]:
         """
         Decodes JWT to extract email, if exists, None is returned otherwise
         """
-        payload = jwt.decode(
-            encoded_jwt,
-            Options.get_secret(),
-            algorithms=Options.get_algorithm(),
-        )
-
-        return payload["email"]
+        try:
+            payload = jwt.decode(
+                encoded_jwt,
+                Options.get_secret(),
+                algorithms=Options.get_algorithm(),
+            )
+            return payload["email"]
+        except Exception:
+            return None
