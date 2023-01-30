@@ -25,28 +25,28 @@ def test_get_movie():
 
     # Check if 'cw' stores a list of content warnings
     try:
-        if data_json.get("cw", None):  # todo: insert CW
-            assert ContentWarning.ContentWarning(
+        if data_json.get("cw", None):
+            assert ContentWarning.ContentWarningReduced(
                 **(data_json.get("cw", None)[0])
-            ), "GET /movie/<id>: 'cw' missing or improper in response."
+            ), "GET /movie/<id>: 'cw' missing in response."
     except Exception as e:
-        assert False, "GET /movie/<id>: 'cw' missing or improper in response."
+        assert False, "GET /movie/<id>: 'cw' improper in response."
 
     # Above for 'similar'
     try:
         assert MovieReduced.MovieReduced(
             **(data_json.get("similar", None)[0])
-        ), "GET /movie/<id>: 'similar' missing or improper in response."
+        ), "GET /movie/<id>: 'similar' missing in response."
     except Exception as e:
-        assert False, "GET /movie/<id>: 'similar' missing or improper in response."
+        assert False, "GET /movie/<id>: 'similar' improper in response."
 
     # Above for [root]
     try:
         assert MovieFull.MovieFull(
             **(data_json)
-        ), "GET /movie/<id>: '[root]' missing or improper in response."
+        ), "GET /movie/<id>: '[root]' missing in response."
     except Exception as e:
-        assert False, "GET /movie/<id>: '[root]' missing or improper in response."
+        assert False, "GET /movie/<id>: '[root]' improper in response."
 
     # Sanity-check values returned.
     assert (
@@ -80,10 +80,12 @@ def test_post_movie():
     # cw_data = cw_entry.jsonify()
     cw_data = {
         "name": "Gun Violence",
-        "time": [120, 270],
-        "movie_id": 42069,
+        "time": [[120, 270]],
+        "movie_id": 76600,
         "desc": "This is a placeholder content warning for testing purposes.",
     }
+
+    # TODO: Log in as a valid user.
 
     data = client.post("/movie/76600", json=cw_data)
     print(data.json())
@@ -114,6 +116,8 @@ def test_post_movie():
         == "This is a placeholder content warning for testing purposes."
     ), "POST /movie/<id>: CW description added with incorrect description."
     assert pulled_cw_data.get("time") == [
-        120,
-        270,
+        [
+            120,
+            270,
+        ]
     ], "POST /movie/<id>: Timestamp tuple-like was added incorrectly."
