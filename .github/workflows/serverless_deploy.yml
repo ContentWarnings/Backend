@@ -36,6 +36,10 @@ jobs:
       run: |
         touch .env
         echo TMDB_API_KEY=${{ secrets.TMDB_API_KEY }} >> .env
+        echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
+        echo JWT_ALGORITHM=${{ secrets.JWT_ALGORITHM }} >> .env
+        echo JWT_SUDO_LIFETIME=${{ secrets.JWT_SUDO_LIFETIME }} >> .env
+        echo JWT_USER_LIFETIME=${{ secrets.JWT_USER_LIFETIME }} >> .env
     - name: serverless deploy
       uses: serverless/github-action@v3.1
       with:
