@@ -9,6 +9,7 @@ from ..cw.ContentWarning import ContentWarning
 import boto3
 import os
 from typing import Dict, Tuple, Union
+from fastapi import status
 
 
 class ContentWarningTable:
@@ -112,3 +113,45 @@ class ContentWarningTable:
             else "failed to delete"
         )
         return {message: cw_id}
+
+    @staticmethod
+    def __voting_op(cw_id: str, hashed_ip_address: str, is_upvote: bool):
+        cw = ContentWarningTable.get_warning(cw_id)
+        if cw is None:
+            return (status.HTTP_404_NOT_FOUND, f"CW {cw_id} does not exist.")
+
+        set_to_add = cw.upvotes if is_upvote else cw.downvotes
+        other_set = cw.downvotes if is_upvote else cw.upvotes
+        desc = "upvote" if is_upvote else "downvote"
+
+        if hashed_ip_address in set_to_add:
+            return (status.HTTP_405_METHOD_NOT_ALLOWED, f"Cannot {desc} again.")
+
+        # if same IP has voted for opposing operation, this is OK; we remove IP address and will add
+        # IP address to designated set instead
+        if hashed_ip_address in other_set:
+            other_set.remove(hashed_ip_address)
+
+        set_to_add.add(hashed_ip_address)
+        cw.calculate_trust_score()
+
+        ContentWarningTable.DYNAMO_DB_CLIENT.put_item(
+            TableName=ContentWarningTable.CW_TABLE,
+            Item=ContentWarningTable.__itemize_ContentWarning_to_db_entry(cw),
+        )
+
+        return "Success"
+
+    @staticmethod
+    def upvote(cw_id: str, hashed_ip_address: str) -> Union[str, Tuple[int, str]]:
+        """
+        Attempts to upvote; returns success string or tuple of HTTP status code and error string
+        """
+        return ContentWarningTable.__voting_op(cw_id, hashed_ip_address, True)
+
+    @staticmethod
+    def downvote(cw_id: str, hashed_ip_address: str) -> Union[str, Tuple[int, str]]:
+        """
+        Attempts to downvote; returns success string or tuple of HTTP status code and error string
+        """
+        return ContentWarningTable.__voting_op(cw_id, hashed_ip_address, False)
