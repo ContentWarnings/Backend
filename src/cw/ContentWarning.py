@@ -79,6 +79,8 @@ class ContentWarning(BaseModel):
         def calculate_num_votes(s: Set[str]) -> int:
             if s is None:
                 return 0
+            # we must check whether the set is "logically empty", since such sets
+            # will contain an empty string to appease DynamoDB (see to_ContentWarning method above)
             if "" in s:
                 return len(s) - 1
             return len(s)
