@@ -13,14 +13,14 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Optional, Union
 
 edit_cw_router = APIRouter()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @edit_cw_router.post("/cw/{cw_id}")
 @Authentication.member
 async def edit_cw(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     cw_id: str = None,
     root: Union[ContentWarningReduced, Nothing] = None,
 ) -> ContentWarningReduced:

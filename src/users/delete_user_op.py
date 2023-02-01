@@ -7,14 +7,14 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 
 delete_user_op_router = APIRouter()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @delete_user_op_router.get("/user/delete-op")
 @Authentication.member
 async def delete_user_op(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     deletion_code: str = None,
 ) -> str:
     if deletion_code is None or len(deletion_code) == 0:

@@ -16,14 +16,14 @@ from typing import Dict, List, Optional
 
 post_cw_router = APIRouter()
 dynamodb_client = boto3.client("dynamodb")
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @post_cw_router.post("/movie/{id}")
 @Authentication.member
 async def post_cw(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     id: int = None,
     root: ContentWarningReduced = None,
 ) -> Dict[ContentWarningReduced, Dict[str, str]]:

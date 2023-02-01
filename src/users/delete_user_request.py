@@ -7,14 +7,14 @@ import uuid
 from typing import Optional
 
 delete_user_request_router = APIRouter()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @delete_user_request_router.get("/user/delete-request")
 @Authentication.member
 async def delete_user_request(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
 ) -> str:
     retval = UserVerificationTable.add_new_verification_code_to_user(
         JWT.get_email(token), deletion_code=str(uuid.uuid4())

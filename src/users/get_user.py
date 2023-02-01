@@ -7,14 +7,14 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 
 get_user_router = APIRouter()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @get_user_router.get("/user")
 @Authentication.member
 async def get_user(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
 ) -> UserExported:
     user = UserTable.get_user_from_decoded_jwt(JWT.get_email(token))
     return UserExported.create(user).jsonify()

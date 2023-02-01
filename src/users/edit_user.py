@@ -10,14 +10,14 @@ from typing import Optional
 import uuid
 
 edit_user_router = APIRouter()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @edit_user_router.post("/user")
 @Authentication.member
 async def edit_user(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     incoming_user: UserReduced = None,
 ) -> str:
     if incoming_user is None:
