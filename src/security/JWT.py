@@ -2,6 +2,7 @@
 # https://statisticsglobe.com/get-unix-timestamp-current-date-time-python
 # https://learning.postman.com/docs/sending-requests/authorization/#bearer-token
 
+from fastapi import HTTPException, status
 import time
 from jose import jwt
 from typing import Union
@@ -29,9 +30,9 @@ class JWT:
         )
 
     @staticmethod
-    def get_email(encoded_jwt: str) -> Union[str, None]:
+    def get_email(encoded_jwt: str) -> str:
         """
-        Decodes JWT to extract email, if exists, None is returned otherwise
+        Decodes JWT to extract email, if exists, otherwise raises exception
         """
         try:
             payload = jwt.decode(
@@ -41,4 +42,6 @@ class JWT:
             )
             return payload["email"]
         except Exception:
-            return None
+            raise HTTPException(
+                status.HTTP_406_NOT_ACCEPTABLE, detail="Error with auth token."
+            )
