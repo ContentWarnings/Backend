@@ -3,7 +3,16 @@
 
 from .cw import edit_cw, get_cw, vote
 from .movies import search, post_cw, get_movie
-from .users import register_user, verify_user, login_user
+from .users import (
+    delete_user_op,
+    delete_user_request,
+    edit_user,
+    register_user,
+    verify_user,
+    login_user,
+    get_user,
+    password_reset_request,
+)
 from fastapi import FastAPI
 from mangum import Mangum
 
@@ -17,6 +26,11 @@ app.include_router(register_user.register_user_router)
 app.include_router(verify_user.verify_user_router)
 app.include_router(login_user.login_user_router)
 app.include_router(vote.vote_router)
+app.include_router(get_user.get_user_router)
+app.include_router(password_reset_request.password_reset_request_router)
+app.include_router(delete_user_request.delete_user_request_router)
+app.include_router(delete_user_op.delete_user_op_router)
+app.include_router(edit_user.edit_user_router)
 
 
 @app.get("/")

@@ -52,11 +52,6 @@ async def edit_cw(
         res2 = ContentWarningTable.delete_warning(cw_id)
 
         email = JWT.get_email(token)
-        if email is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User does not exist or invalid session token.",
-            )
         res3 = UserTable.delete_cw(email, cw_id)
 
         res1.update(res2)
