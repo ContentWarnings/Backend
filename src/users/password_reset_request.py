@@ -15,9 +15,6 @@ def password_reset_request(email: str) -> str:
     if type(retval) is tuple:
         raise HTTPException(status_code=retval[0], detail=retval[1])
 
-    # set user to unverified
-    UserTable.set_user_to_verified(email, is_verified=False)
-
     # TODO: send email
 
     return "Check your email for a password reset code."
