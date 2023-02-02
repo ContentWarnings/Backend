@@ -11,6 +11,7 @@ from .users import (
     verify_user,
     login_user,
     get_user,
+    password_reset_op,
     password_reset_request,
 )
 from fastapi import FastAPI
@@ -31,6 +32,7 @@ app.include_router(password_reset_request.password_reset_request_router)
 app.include_router(delete_user_request.delete_user_request_router)
 app.include_router(delete_user_op.delete_user_op_router)
 app.include_router(edit_user.edit_user_router)
+app.include_router(password_reset_op.password_reset_op_router)
 
 
 @app.get("/")
