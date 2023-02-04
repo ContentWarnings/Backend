@@ -8,6 +8,7 @@ class UserVerification(BaseModel):
 
     email: str
     code: str  # verification code, UUID
+    deletion_code: str  # UUID
 
     def jsonify(self):
         return self.__dict__

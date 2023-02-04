@@ -20,7 +20,7 @@ class ContentWarningReduced(BaseModel):
     """
 
     def to_ContentWarning(
-        self, trust: int = 0, upvotes: Set[str] = None, downvotes: Set[str] = None
+        self, trust: float = 0, upvotes: Set[str] = None, downvotes: Set[str] = None
     ):
         """
         Creates a new ContentWarning object from self
@@ -69,6 +69,36 @@ class ContentWarning(BaseModel):
     def jsonify(self):
         return self.__dict__
 
+    def calculate_trust_score(self) -> None:
+        """
+        Calculates and sets internal trust score
+        """
+        LOWEST_TRUST_SCORE = 0.0
+        HIGHEST_TRUST_SCORE = 1.0
+
+        def calculate_num_votes(s: Set[str]) -> int:
+            if s is None:
+                return 0
+            # we must check whether the set is "logically empty", since such sets
+            # will contain an empty string to appease DynamoDB (see to_ContentWarning method above)
+            if "" in s:
+                return len(s) - 1
+            return len(s)
+
+        upvote_num = calculate_num_votes(self.upvotes)
+        downvote_num = calculate_num_votes(self.downvotes)
+
+        numerator = upvote_num
+        denominator = upvote_num + downvote_num
+
+        if denominator == 0:  # avoid divide by zero
+            if numerator == 0:  # no upvotes and no downvotes
+                self.trust = LOWEST_TRUST_SCORE
+            else:  # all upvotes!
+                self.trust = HIGHEST_TRUST_SCORE
+        else:
+            self.trust = numerator / denominator
+
     name: str
     id: str  # UUID
     movie_id: int  # TMDB ID
@@ -76,6 +106,6 @@ class ContentWarning(BaseModel):
     desc: str
 
     # hidden fields
-    trust: int
-    upvotes: Set[str]
-    downvotes: Set[str]
+    trust: float  # continuous scale on [0, 1]
+    upvotes: Set[str]  # hashed IP addresses
+    downvotes: Set[str]  # hashed IP addresses

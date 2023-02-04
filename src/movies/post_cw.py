@@ -16,14 +16,14 @@ from typing import Dict, List, Optional
 
 post_cw_router = APIRouter()
 dynamodb_client = boto3.client("dynamodb")
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @post_cw_router.post("/movie/{id}")
 @Authentication.member
 async def post_cw(
     request: Request,
-    token: Optional[str] = Depends(oath2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     id: int = None,
     root: ContentWarningReduced = None,
 ) -> Dict[ContentWarningReduced, Dict[str, str]]:
@@ -51,11 +51,6 @@ async def post_cw(
 
     # add cw UUID to user object
     email = JWT.get_email(token)
-    if email is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User does not exist or invalid session token.",
-        )
     user = UserTable.get_user(email)
     if user is None:
         raise HTTPException(
