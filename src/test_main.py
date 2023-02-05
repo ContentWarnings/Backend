@@ -6,6 +6,7 @@ import os
 
 from .main import app
 from .security.JWT import JWT
+
 # from .databases.UserTable import UserTable
 
 client = TestClient(app)
@@ -20,10 +21,10 @@ def get_fake_session():
 
 # def test_create_fake_user():
 #     # POST /user/register
-    # creds = {
-    #     "email": f"test_user@moviementor.app",
-    #     "password": "WeAreInDevThisHardCodedCredIsProbablyFine1337!",
-    # }
+# creds = {
+#     "email": f"test_user@moviementor.app",
+#     "password": "WeAreInDevThisHardCodedCredIsProbablyFine1337!",
+# }
 #     register_data = client.post("/user/register", json=creds)
 
 #     UserTable.set_user_to_verified("test_user@moviementor.app")
@@ -71,7 +72,7 @@ def test_env_variables():
 
     # JWT sanity checks
     ONE_DAY = 86400
-    
+
     assert (
         os.environ["JWT_ALGORITHM"] == "HS256"
     ), "Unexpected env variable: Why was the JWT algorithm changed?"
