@@ -12,19 +12,19 @@ def login_user(incoming_user: UserReduced):
     user = UserTable.get_user(incoming_user.email)
 
     if user is None:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User does not exist or password does not match.",
         )
 
     if not user.verified:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Error: User is not verified yet.",
         )
 
     if not Bcrypter.do_passwords_match(incoming_user.password, user.password):
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User does not exist or password does not match.",
         )

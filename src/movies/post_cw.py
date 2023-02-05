@@ -28,18 +28,18 @@ async def post_cw(
     root: ContentWarningReduced = None,
 ) -> Dict[ContentWarningReduced, Dict[str, str]]:
     if id is None:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No movie ID given."
         )
 
     if root is None:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No content warning object given.",
         )
 
     if id != root.movie_id:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"CW movie ID {root.movie_id} != endpoint movie ID {id}",
         )

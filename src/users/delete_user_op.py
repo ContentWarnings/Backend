@@ -18,7 +18,7 @@ async def delete_user_op(
     deletion_code: str = None,
 ) -> str:
     if deletion_code is None or len(deletion_code) == 0:
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="No deletion code provided."
         )
 
