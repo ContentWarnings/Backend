@@ -3,10 +3,12 @@
 
 from fastapi.testclient import TestClient
 import os
+import uuid
 
 from ..main import app
 from ..cw import ContentWarning
 from . import MovieReduced, MovieFull
+from ..test_main import get_fake_session
 
 client = TestClient(app)
 
@@ -65,10 +67,14 @@ def test_post_movie():
     """
 
     cw_count = -1
+    uuid_run = uuid.uuid4().hex
+
+    print(f"POST /movie/<id>: Test run #{uuid_run}")
 
     # 1. get current list of CWs
     data_init = client.get("/movie/76600").json()  # Avatar 2
     cw_count = len(data_init.get("cw", []))
+    print(data_init)
 
     # 2. add CW
     # cw_entry = ContentWarning.ContentWarning(
@@ -81,17 +87,23 @@ def test_post_movie():
     cw_data = {
         "name": "Gun Violence",
         "time": [[120, 270]],
+        "id": "PLACEHOLDER14",
         "movie_id": 76600,
-        "desc": "This is a placeholder content warning for testing purposes.",
+        "desc": f"This is a placeholder content warning for testing purposes. Test ID: {uuid_run}",
     }
 
-    # TODO: Log in as a valid user.
-
-    data = client.post("/movie/76600", json=cw_data)
+    # Log in as a valid user and post movie.
+    jwt = get_fake_session()
+    data = client.post("/movie/76600", json=cw_data, headers={"Authorization": f"Bearer {jwt}"})
+    print("-------------------")
+    print(jwt)
     print(data.json())
+    print("-------------------")
 
     # 3. see if CW was added properly
     data_fin = client.get("/movie/76600").json()  # Avatar 2
+    print(data_fin)
+
     assert cw_count + 1 == len(
         data_fin.get("cw", [])
     ), "POST /movie/<id>: New content warning was not appended to the database."
@@ -112,8 +124,7 @@ def test_post_movie():
         pulled_cw_data.get("movie_id") == 76600
     ), f"POST /movie/<id>: Movie ID was appended incorrectly (expected 76600, got {pulled_cw_data.get('movie_id')})."
     assert (
-        pulled_cw_data.get("desc")
-        == "This is a placeholder content warning for testing purposes."
+        "This is a placeholder content warning for testing purposes." in pulled_cw_data.get("desc")
     ), "POST /movie/<id>: CW description added with incorrect description."
     assert pulled_cw_data.get("time") == [
         [
