@@ -1,4 +1,4 @@
-# References;
+# References
 # https://fastapi.tiangolo.com/tutorial/testing/
 
 from fastapi.testclient import TestClient
