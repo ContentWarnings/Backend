@@ -27,6 +27,10 @@ jobs:
           make -j 4
           make install
 
+      - name: Debug instruction -- please remove!
+        run: |
+          echo $JWT_ALGORITHM
+
 
       - name: Write AWS secrets to ~/.aws
         run: |
