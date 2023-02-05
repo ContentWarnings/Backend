@@ -94,7 +94,9 @@ def test_post_movie():
 
     # Log in as a valid user and post movie.
     jwt = get_fake_session()
-    data = client.post("/movie/76600", json=cw_data, headers={"Authorization": f"Bearer {jwt}"})
+    data = client.post(
+        "/movie/76600", json=cw_data, headers={"Authorization": f"Bearer {jwt}"}
+    )
     print("-------------------")
     print(jwt)
     print(data.json())
@@ -124,7 +126,8 @@ def test_post_movie():
         pulled_cw_data.get("movie_id") == 76600
     ), f"POST /movie/<id>: Movie ID was appended incorrectly (expected 76600, got {pulled_cw_data.get('movie_id')})."
     assert (
-        "This is a placeholder content warning for testing purposes." in pulled_cw_data.get("desc")
+        "This is a placeholder content warning for testing purposes."
+        in pulled_cw_data.get("desc")
     ), "POST /movie/<id>: CW description added with incorrect description."
     assert pulled_cw_data.get("time") == [
         [

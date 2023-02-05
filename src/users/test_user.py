@@ -17,13 +17,6 @@ client = TestClient(app)
 do_check_status_codes = False
 do_stringlike_checks = True
 
-# Just a note: I do not think it's really possible to test the account creation flow because we
-# send an validation email. That would require a lot of infrastructure to work properly, and
-# it approaches diminishing marginal returns.
-# The only way we can get it to work practically is if we 'stub out' email verification if running
-# in a development environment.
-# The same applies to the user deletion endpoints.
-
 
 def NOtest_account_lifecycle():
     """
@@ -49,7 +42,9 @@ def NOtest_account_lifecycle():
     print(f"Adopting email {creds.get('email')} for this test...")
     register_data = client.post("/user/register", json=creds)
     if do_stringlike_checks:
-        assert register_data.json().get('response', None) != None, "GET /user/register: Lacking 'response' JSON field."
+        assert (
+            register_data.json().get("response", None) != None
+        ), "GET /user/register: Lacking 'response' JSON field."
 
     # POST /auth/login (unverified)
     bad_login_data = client.post("/auth/login", json=creds)
@@ -67,7 +62,9 @@ def NOtest_account_lifecycle():
     # Test email verification flow.
     verify_code = {
         "email": creds.get("email"),
-        "code": UserVerificationTable.get_user_verification_obj(creds.get("email")).code
+        "code": UserVerificationTable.get_user_verification_obj(
+            creds.get("email")
+        ).code,
     }
     verify_data = client.post("/user/verify", json=verify_code)
 
@@ -117,7 +114,9 @@ def NOtest_account_lifecycle():
         "/user", json=email_tweaks, headers={"Authorization": f"Bearer {bearerToken}"}
     )
     if do_stringlike_checks:
-        assert edit_user_data.json().get('response', None) != None, "GET /user: Lacking 'response' JSON field."
+        assert (
+            edit_user_data.json().get("response", None) != None
+        ), "GET /user: Lacking 'response' JSON field."
 
     # Do not allow emails to be changed willy-nilly; they need reverification. So old creds should still work.
     new_creds = {"email": email_tweaks.get("email"), "password": creds.get("password")}
@@ -128,7 +127,7 @@ def NOtest_account_lifecycle():
         assert (
             failed_login_data.status_code != 200
         ), "POST /auth/login: Email was changed without re-verification (Expected HTTP 4xx, got HTTP 200)."
-    
+
     assert (
         failed_login_data.json().get("token", None) == None
     ), "POST /auth/login: Email was changed without re-verification (token received)."
@@ -173,7 +172,7 @@ def NOtest_account_lifecycle():
     ## Uncomment once <@ContentWarnings@github.com/Backend/issues/32> is fixed.
     ## This is the verification logic for the above.
     # successful_login_data = client.post("/auth/login", json=new_creds)
-    # 
+    #
     # if do_check_status_codes:
     #     assert (
     #         successful_login_data.status_code == 200
@@ -183,20 +182,28 @@ def NOtest_account_lifecycle():
     # ), "POST /auth/login: Password was not changed (token empty or not set)."
 
     # Outside password reset
-    password_reset_data = client.get(f"/user/password-reset-request?email={creds.get('email')}")
+    password_reset_data = client.get(
+        f"/user/password-reset-request?email={creds.get('email')}"
+    )
     if do_stringlike_checks:
-        assert password_reset_data.json().get('response', None) != None, "GET /user/password-reset-request: Lacking 'response' JSON field."
+        assert (
+            password_reset_data.json().get("response", None) != None
+        ), "GET /user/password-reset-request: Lacking 'response' JSON field."
 
     # Get reset code (this may need to change eventually, btw.)
-    reset_code = UserVerificationTable.get_user_verification_obj(creds.get("email")).code
+    reset_code = UserVerificationTable.get_user_verification_obj(
+        creds.get("email")
+    ).code
 
     # (This first code attempt is wrong)
     password_reset_body = {
         "email": creds.get("email"),
         "new_password": creds.get("email") + "#changed",
-        "code": reset_code + "-wrong"
+        "code": reset_code + "-wrong",
     }
-    password_commit_data = client.post("/user/password-reset-op", json=password_reset_body)
+    password_commit_data = client.post(
+        "/user/password-reset-op", json=password_reset_body
+    )
     if do_check_status_codes:
         assert (
             password_commit_data.status_code != 200
@@ -206,15 +213,19 @@ def NOtest_account_lifecycle():
     password_reset_body = {
         "email": creds.get("email"),
         "new_password": creds.get("password") + "#changed",
-        "code": reset_code
+        "code": reset_code,
     }
-    password_commit_data = client.post("/user/password-reset-op", json=password_reset_body)
+    password_commit_data = client.post(
+        "/user/password-reset-op", json=password_reset_body
+    )
     if do_check_status_codes:
         assert (
             password_commit_data.status_code == 200
         ), f"POST /user/password-reset-op: Password unchanged with a code (expected HTTP 200, got {password_commit_data.status_code})"
     if do_stringlike_checks:
-        assert password_commit_data.json().get('response', None) != None, "GET /user/password-reset-op: Lacking 'response' JSON field."
+        assert (
+            password_commit_data.json().get("response", None) != None
+        ), "GET /user/password-reset-op: Lacking 'response' JSON field."
 
     # Test user
     new_creds = {
@@ -233,28 +244,42 @@ def NOtest_account_lifecycle():
     ), "POST /auth/login: Externally-reset password was not changed (token empty or not set)."
 
     # Delete account.
-    delete_request_data = client.get(f"/user/delete-request", headers={"Authorization": f"Bearer {bearerToken}"})
+    delete_request_data = client.get(
+        f"/user/delete-request", headers={"Authorization": f"Bearer {bearerToken}"}
+    )
     if do_stringlike_checks:
-        assert delete_request_data.json().get('response', None) != None, "GET /user/delete-request: Lacking 'response' JSON field."
+        assert (
+            delete_request_data.json().get("response", None) != None
+        ), "GET /user/delete-request: Lacking 'response' JSON field."
 
     # Get deletion code
-    reset_code = UserVerificationTable.get_user_verification_obj(creds.get("email")).deletion_code
+    reset_code = UserVerificationTable.get_user_verification_obj(
+        creds.get("email")
+    ).deletion_code
 
     # (This first code attempt is wrong)
-    delete_commit_data = client.get("/user/delete-op?deletion_code=invalid-deletion-code", headers={"Authorization": f"Bearer {bearerToken}"})
+    delete_commit_data = client.get(
+        "/user/delete-op?deletion_code=invalid-deletion-code",
+        headers={"Authorization": f"Bearer {bearerToken}"},
+    )
     if do_check_status_codes:
         assert (
             delete_commit_data.status_code != 200
         ), f"POST /user/delete-op: Delection occured without a valid code (expected HTTP 4xx, got 200)"
 
     # (this second attempt is correct)
-    delete_commit_data = client.get("/user/delete-op?deletion_code=" + reset_code, headers={"Authorization": f"Bearer {bearerToken}"})
+    delete_commit_data = client.get(
+        "/user/delete-op?deletion_code=" + reset_code,
+        headers={"Authorization": f"Bearer {bearerToken}"},
+    )
     if do_check_status_codes:
         assert (
             delete_commit_data.status_code == 200
         ), f"POST /user/delete-op: Password unchanged with a code (expected HTTP 200, got {delete_commit_data.status_code})"
     if do_stringlike_checks:
-        assert password_commit_data.json().get('response', None) != None, "GET /user/delete-op: Lacking 'response' JSON field."
+        assert (
+            password_commit_data.json().get("response", None) != None
+        ), "GET /user/delete-op: Lacking 'response' JSON field."
 
     # (Recall: new_creds = creds from last password reset)
     successful_login_data = client.post("/auth/login", json=new_creds)
@@ -264,4 +289,6 @@ def NOtest_account_lifecycle():
             successful_login_data.status_code == 404
         ), f"POST /auth/login: Account was not deleted (expected HTTP 404, got {successful_login_data.status_code})"
 
-    assert successful_login_data.json().get("token", None) == None, "GET /auth/login: Logged in from a deleted account."
+    assert (
+        successful_login_data.json().get("token", None) == None
+    ), "GET /auth/login: Logged in from a deleted account."
