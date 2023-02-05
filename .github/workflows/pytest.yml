@@ -53,9 +53,9 @@ jobs:
           export JWT_USER_LIFETIME=604800
 
       - name: Install project dependencies
-        run: pip install -r requirements.txt
+        run: python3 -m pip install -r requirements.txt
       - name: Install GitHub Action dependencies
-        run: pip install pytest-md pytest-emoji
+        run: python3 -m pip install pytest-md pytest-emoji
       - uses: pavelzw/pytest-action@v2
         with:
           emoji: true
