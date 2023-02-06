@@ -1,3 +1,6 @@
+# References:
+# - https://stackoverflow.com/questions/4906579/how-to-use-bash-to-create-a-folder-if-it-doesnt-already-exist#4906665
+
 name: Run Python tests
 
 on:
@@ -29,12 +32,16 @@ jobs:
 
       - name: Debug instruction -- please remove!
         run: |
-          echo $JWT_ALGORITHM
+          echo "JWT is $JWT_ALGORITHM"
 
 
       - name: Write AWS secrets to ~/.aws
         run: |
           mkdir ~/.aws
+          if [ ! -d ~/.aws ]; then
+            mkdir -p ~/.aws;
+          fi
+
           echo "[default]
           aws_access_key_id=$AWS_ACCESS_KEY_ID
           aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" > ~/.aws/credentials
