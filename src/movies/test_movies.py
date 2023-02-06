@@ -87,8 +87,6 @@ def test_post_movie():
     cw_data = {
         "name": "Gun Violence",
         "time": [[120, 270]],
-        "id": "PLACEHOLDER14",
-        "movie_id": 76600,
         "desc": f"This is a placeholder content warning for testing purposes. Test ID: {uuid_run}",
     }
 
@@ -223,6 +221,33 @@ def test_get_search_q():
     assert (
         single_result.get("id") == 76600
     ), f"GET /search?q: First result is incorrect. Expected 76600, got {single_result.get('id')}."
+
+
+def test_get_search_p():
+    """
+    GET /search, with p defined
+    """
+
+    # Get if p set.
+    data = client.get("/search?q=Avatar&p=2")
+    assert data.status_code == 200, "GET /search?p: Invalid response from server."
+
+    data_json = data.json()
+    assert data_json != None, "GET /search?p: No response if p set.."
+    assert data_json != {}, "GET /search?p: Empty response if p set.."
+
+    assert (
+        data_json.get("results", None) != None
+    ), "GET /search?p: Expected key 'results' is missing"
+    assert (
+        len(data_json.get("results")) > 0
+    ), "GET /search?p: Expected key 'results' is empty"
+
+    single_result = data_json.get("results")[0]
+
+    assert (
+        single_result.get("id") != 76600
+    ), f"GET /search?p: First result is incorrect. Expected NOT 76600, got 76600."
 
 
 def test_get_search_genre():
