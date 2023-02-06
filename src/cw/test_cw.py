@@ -66,17 +66,23 @@ def test_post_cw():
     helper_edit_cw({"time": [[90, 120]]}, jwt=jwt)
     helper_edit_cw({"desc": "This was changed!"}, jwt=jwt)
     helper_edit_cw({"time": [[90, 120]], "desc": "This was changed!"}, jwt=jwt)
-    
+
     # Check to ensure we cannot edit other users' CWs
     uuid_illegal = uuid.uuid4().hex
     print(f"Illegal POST /cw/<id>: Adopting ID {uuid_illegal}")
-    data = client.post(f"/cw/PLACEHOLDER/", json={"desc": f"Illicit change: Test = {uuid_illegal}"}, headers={"Authorization": f"Bearer {jwt}"})
+    data = client.post(
+        f"/cw/PLACEHOLDER/",
+        json={"desc": f"Illicit change: Test = {uuid_illegal}"},
+        headers={"Authorization": f"Bearer {jwt}"},
+    )
     assert (
         data.status_code != 200
     ), f"POST /cw/<id>: Able to edit another user's CW (Test = {uuid_illegal})"
 
     # Above, but not logged in.
-    data = client.post(f"/cw/PLACEHOLDER/", json={"desc": f"Unauthed change: Test = {uuid_illegal}"})
+    data = client.post(
+        f"/cw/PLACEHOLDER/", json={"desc": f"Unauthed change: Test = {uuid_illegal}"}
+    )
     assert (
         data.status_code != 200
     ), f"POST /cw/<id>: Able to edit another user's CW (Test = {uuid_illegal})"
@@ -121,7 +127,9 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     helper_cw_vote(cw_id=cw_id)
 
     # Send HTTP request.
-    data = client.post(f"/cw/{cw_id}/", json=edit_data, headers={"Authorization": f"Bearer {jwt}"})
+    data = client.post(
+        f"/cw/{cw_id}/", json=edit_data, headers={"Authorization": f"Bearer {jwt}"}
+    )
 
     assert (
         data.status_code < 400
@@ -132,7 +140,9 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
 
     # Data sanity check
     union = dict(edit_data, **example_data)
-    new_obj = ContentWarningTable.get_warning(cw_id).to_ContentWarningReduced().jsonify()
+    new_obj = (
+        ContentWarningTable.get_warning(cw_id).to_ContentWarningReduced().jsonify()
+    )
     new_obj_full = ContentWarningTable.get_warning(cw_id).jsonify()
     new_obj["time"] = [[new_obj["time"][0][0], new_obj["time"][0][1]]]  # tuple -> list
 
@@ -143,22 +153,30 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     assert union == new_obj, "POST /cw/<id>: Data did not change as expected."
 
     # Check if trust was changed in new_obj
-    assert new_obj_full.get("trust") == 0.0, "POST /cw/<id>: Trust score not reset on modification."
-    assert len(new_obj_full.get("upvotes")) == 1, "POST /cw/<id>: Upvote list not reset on modification."
-    assert len(new_obj_full.get("downvotes")) == 1, "POST /cw/<id>: Downvote list not reset on modification."
+    assert (
+        new_obj_full.get("trust") == 0.0
+    ), "POST /cw/<id>: Trust score not reset on modification."
+    assert (
+        len(new_obj_full.get("upvotes")) == 1
+    ), "POST /cw/<id>: Upvote list not reset on modification."
+    assert (
+        len(new_obj_full.get("downvotes")) == 1
+    ), "POST /cw/<id>: Downvote list not reset on modification."
 
     # Clean-up / deletion test (+ sanity checks).
-    data = client.post(f"/cw/{cw_id}/", json={"name": "None"}, headers={"Authorization": f"Bearer {jwt}"})
-    assert (
-        data.status_code < 400
-    ), f"POST /cw/<id>: Invalid response from server."
+    data = client.post(
+        f"/cw/{cw_id}/",
+        json={"name": "None"},
+        headers={"Authorization": f"Bearer {jwt}"},
+    )
+    assert data.status_code < 400, f"POST /cw/<id>: Invalid response from server."
     assert (
         data.json().get("response", None) != None
     ), f"POST /cw/<id>: Lacking 'response' JSON field."
 
-    assert ContentWarningTable.get_warning(cw_id) == None, "POST /cw/<id>: Deletion of CW failed."
-
-        
+    assert (
+        ContentWarningTable.get_warning(cw_id) == None
+    ), "POST /cw/<id>: Deletion of CW failed."
 
 
 def helper_get_hashed_ip():

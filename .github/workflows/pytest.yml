@@ -34,10 +34,8 @@ jobs:
         run: |
           echo "JWT is $JWT_ALGORITHM"
 
-
       - name: Write AWS secrets to ~/.aws
         run: |
-          mkdir ~/.aws
           if [ ! -d ~/.aws ]; then
             mkdir -p ~/.aws;
           fi
