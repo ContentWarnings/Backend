@@ -52,10 +52,10 @@ def test_get_movie():
 
     # Sanity-check values returned.
     assert (
-        "avatar" in data_json.get("title", None).lower()
+        "avatar" in data_json.get("title", "").lower()
     ), "GET /movie/<id>: Invalid movie title."
     assert (
-        data_json.get("mpa", None).lower() == "pg-13"
+        data_json.get("mpa", "").lower() == "pg-13"
     ), "GET /movie/<id>: Invalid movie rating."
 
     # TODO: check if 'similar' stores a list of similar movies.
