@@ -59,7 +59,27 @@ def test_post_cw():
     POST /cw/<id>
     """
 
-    cw_id = "PLACEHOLDER2"
+    jwt = get_fake_session()
+
+    # Check if fields were edited + deletion checks.
+    helper_edit_cw({"name": "Ableism"}, jwt=jwt)
+    helper_edit_cw({"time": [[90, 120]]}, jwt=jwt)
+    helper_edit_cw({"desc": "This was changed!"}, jwt=jwt)
+    helper_edit_cw({"time": [[90, 120]], "desc": "This was changed!"}, jwt=jwt)
+    
+    # Check to ensure we cannot edit other users' CWs
+    uuid_illegal = uuid.uuid4().hex
+    print(f"Illegal POST /cw/<id>: Adopting ID {uuid_illegal}")
+    data = client.post(f"/cw/PLACEHOLDER/", json={"desc": f"Illicit change: Test = {uuid_illegal}"}, headers={"Authorization": f"Bearer {jwt}"})
+    assert (
+        data.status_code != 200
+    ), f"POST /cw/<id>: Able to edit another user's CW (Test = {uuid_illegal})"
+
+    # Above, but not logged in.
+    data = client.post(f"/cw/PLACEHOLDER/", json={"desc": f"Unauthed change: Test = {uuid_illegal}"})
+    assert (
+        data.status_code != 200
+    ), f"POST /cw/<id>: Able to edit another user's CW (Test = {uuid_illegal})"
 
 
 def test_post_cw_upvote():
@@ -78,20 +98,85 @@ def test_post_cw_downvote():
     helper_cw_vote(True)
 
 
+def helper_edit_cw(edit_data, jwt=get_fake_session()):
+    """
+    Helper function to perform, and validate, CW edit operations.
+    """
+    uuid_run = uuid.uuid4().hex
+    print(f"POST /cw/<id>: Adopting ID {uuid_run}")
+
+    # Create CW for testing
+    example_data = {
+        "name": "Gun Violence",
+        "time": [[60, 120]],
+        "desc": f"POST /cw/ test run: {uuid_run}",
+    }
+    cw_data = client.post(
+        "/movie/76600", json=example_data, headers={"Authorization": f"Bearer {jwt}"}
+    )
+    cw_json = cw_data.json()
+    cw_id = cw_json[-1].get("id", None)
+
+    # Upvote (so there's something there.)
+    helper_cw_vote(cw_id=cw_id)
+
+    # Send HTTP request.
+    data = client.post(f"/cw/{cw_id}/", json=edit_data, headers={"Authorization": f"Bearer {jwt}"})
+
+    assert (
+        data.status_code < 400
+    ), f"POST /cw/<id>: Invalid response from server (expected non-error, got {data.status_code})."
+    assert (
+        data.json().get("response", None) != None
+    ), f"POST /cw/<id>: Lacking 'response' JSON field."
+
+    # Data sanity check
+    union = dict(edit_data, **example_data)
+    new_obj = ContentWarningTable.get_warning(cw_id).to_ContentWarningReduced().jsonify()
+    new_obj_full = ContentWarningTable.get_warning(cw_id).jsonify()
+    new_obj["time"] = [[new_obj["time"][0][0], new_obj["time"][0][1]]]  # tuple -> list
+
+    print(union)
+    print("^^ expected ^^----vv actual vv")
+    print(new_obj)
+
+    assert union == new_obj, "POST /cw/<id>: Data did not change as expected."
+
+    # Check if trust was changed in new_obj
+    assert new_obj_full.get("trust") == 0.0, "POST /cw/<id>: Trust score not reset on modification."
+    assert len(new_obj_full.get("upvotes")) == 1, "POST /cw/<id>: Upvote list not reset on modification."
+    assert len(new_obj_full.get("downvotes")) == 1, "POST /cw/<id>: Downvote list not reset on modification."
+
+    # Clean-up / deletion test (+ sanity checks).
+    data = client.post(f"/cw/{cw_id}/", json={"name": "None"}, headers={"Authorization": f"Bearer {jwt}"})
+    assert (
+        data.status_code < 400
+    ), f"POST /cw/<id>: Invalid response from server."
+    assert (
+        data.json().get("response", None) != None
+    ), f"POST /cw/<id>: Lacking 'response' JSON field."
+
+    assert ContentWarningTable.get_warning(cw_id) == None, "POST /cw/<id>: Deletion of CW failed."
+
+        
+
+
 def helper_get_hashed_ip():
+    """
+    Helper function to get the hashed IP address.
+    """
     ip_address = get("https://ipapi.co/ip/").text
     hashed_ip_address = Sha256.hash(ip_address)
 
     return hashed_ip_address
 
 
-def helper_cw_vote(is_downvote=False):
+def helper_cw_vote(is_downvote=False, cw_id="PLACEHOLDER2"):
     """
     Helper function that triggers an upvote (or downvote)
     """
 
     vote_type = "downvote" if is_downvote else "upvote"
-    cw_id = "PLACEHOLDER2"
 
     # Get original trust score
     old_trust = ContentWarningTable.get_warning(cw_id).jsonify().get("trust")
