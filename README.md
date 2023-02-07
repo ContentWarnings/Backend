@@ -77,3 +77,6 @@ git push origin adam/bug-fix
 
 # Questions?
 Reach out to Quikks1lver; he's happy to help!
+
+## References for this README
+- https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
