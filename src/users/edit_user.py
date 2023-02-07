@@ -1,3 +1,5 @@
+from .CodeGenerator import CodeGenerator
+from ..email.Emailer import Emailer
 from ..security.Bcrypter import Bcrypter
 from ..users.User import UserReduced
 from ..databases.UserTable import UserTable
@@ -7,7 +9,6 @@ from ..security.JWT import JWT
 from fastapi import APIRouter, HTTPException, Request, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
-import uuid
 
 edit_user_router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -52,6 +53,10 @@ async def edit_user(
     # 2. changing email and maybe password, too
     # this means we basically clone old user into a new object, delete old object, and re-add "new"
     # user, because this means they need to go thru verification again if email changes
+
+    # first, verify new email
+    Emailer.perform_email_validation(incoming_user.email)
+
     UserVerificationTable.delete_user_verification_obj(prev_user.email)
     UserTable.delete_user(prev_user.email)
 
@@ -59,9 +64,11 @@ async def edit_user(
     updated_user.contributions = prev_user.contributions  # copy over CW IDs
 
     # add to both tables
-    UserVerificationTable.add_user(updated_user.email, verif_code=str(uuid.uuid4()))
+    verification_code = CodeGenerator.create_new_verification_code()
+    UserVerificationTable.add_user(updated_user.email, verif_code=verification_code)
     UserTable.add_user_obj(updated_user)
 
+    Emailer.send_code_via_email(
+        updated_user.email, verification_code, Emailer.VerificationCode.VERIFICATION
+    )
     return "Edited information. Check your email for a new verification code."
-
-    # TODO: send another verification email

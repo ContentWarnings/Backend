@@ -10,6 +10,8 @@ Copyright (c) 2018 Sebastián Ramírez
 
 Copyright (c) 2020 Jordan Eremieff
 
+Copyright (C) 2023, Twilio SendGrid, Inc. <help@twilio.com>
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
