@@ -1,3 +1,7 @@
+![Serverless Deploy](https://github.com/ContentWarnings/Backend/actions/workflows/serverless_deploy.yml/badge.svg)
+![Black Formatting](https://github.com/ContentWarnings/Backend/actions/workflows/black.yml/badge.svg)
+![Security Scan](https://github.com/ContentWarnings/Backend/actions/workflows/sast-scanner.yml/badge.svg)
+
 # Welcome!
 This is the home for our Python/FastAPI AWS backend for senior design. Please refer to the following sections for what you need.
 
