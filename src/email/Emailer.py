@@ -70,7 +70,11 @@ class Emailer:
         except Exception as ex:
             print("Error sending email:")
             print(ex)
-            return False
+
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail=f"Error sending email to {receiver_email}.",
+            )
 
     @staticmethod
     def send_code_via_email(
