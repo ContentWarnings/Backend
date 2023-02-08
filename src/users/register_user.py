@@ -1,16 +1,26 @@
+from .CodeGenerator import CodeGenerator
 from ..databases.UserTable import UserTable
 from ..databases.UserVerificationTable import UserVerificationTable
+from ..email.Emailer import Emailer
 from ..users.User import UserReduced
-from fastapi import APIRouter, HTTPException
-import uuid
+from fastapi import APIRouter, HTTPException, status
 
 register_user_router = APIRouter()
 
 
 @register_user_router.post("/user/register")
 def register_user(user: UserReduced):
+    # check if user already exists
+    if UserTable.get_user(user.email) is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Cannot use specified email."
+        )
+
+    Emailer.perform_email_validation(user.email)
+
+    verif_code = CodeGenerator.create_new_verification_code()
     user_verification_retval = UserVerificationTable.add_user(
-        email=user.email, verif_code=str(uuid.uuid4())
+        email=user.email, verif_code=verif_code
     )
     if type(user_verification_retval) is tuple:
         raise HTTPException(
@@ -21,4 +31,8 @@ def register_user(user: UserReduced):
     if type(add_user_retval) is tuple:
         raise HTTPException(status_code=add_user_retval[0], detail=add_user_retval[1])
 
-    # TODO: send verification code email to user
+    Emailer.send_code_via_email(
+        user.email, verif_code, Emailer.VerificationCode.VERIFICATION
+    )
+
+    # TODO: JSON response
