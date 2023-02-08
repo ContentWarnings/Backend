@@ -15,8 +15,6 @@ provider:
   region: us-east-1
   stage: prod # change while on feature branches!
   apiGateway:
-    apiKeys:
-      - awsSecret # change while on feature branches!
     usagePlan:
       quota:
         limit: 5000
@@ -54,14 +52,7 @@ functions:
   app:
     handler: src.main.handler
     events:
-      - http:
-          path: /{any+}
-          method: ANY
-          private: true
-      - http:
-          path: /
-          method: ANY
-          private: true
+      - httpApi: '*'
 
 custom:
   pythonRequirements:
