@@ -18,6 +18,7 @@ class UserTable:
     def __parse_db_entry_to_User(item: dict) -> User:
         return User(
             email=item["email"]["S"],
+            new_pending_email=item["new_pending_email"]["S"],
             password=item["password"]["S"],
             verified=item["verified"]["BOOL"],
             contributions=[entry["S"] for entry in item["contributions"]["L"]],
@@ -27,6 +28,7 @@ class UserTable:
     def __itemize_User_to_db_entry(user: User) -> dict:
         return {
             "email": {"S": user.email},
+            "new_pending_email": {"S": user.new_pending_email},
             "password": {"S": user.password},
             "verified": {"BOOL": user.verified},
             "contributions": {"L": [{"S": cw_id} for cw_id in user.contributions]},
