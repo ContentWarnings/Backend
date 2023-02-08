@@ -1,6 +1,9 @@
+# References
+# https://www.w3schools.com/python/ref_list_sort.asp
+
 from .PosterPath import PosterPath
 from ..databases.MovieTable import MovieTable
-from ..cw.ContentWarning import ContentWarningReduced
+from ..cw.ContentWarning import ContentWarningReduced, ContentWarning
 from .MovieReduced import MovieReduced
 from ..tmdb.tmdb import TMDB
 import json
@@ -73,10 +76,14 @@ class MovieFull(BaseModel):
         movie_full_fields["cmid"] = -1
         movie_full_fields["mpa"] = TMDB.get_mpa_rating(movie_id)
 
+        # obtain all content warnings and sort the list in descending order of trust score
+        # in other words, highest trust score at index 0, lowest at index -1
+        movie_full_fields["cw"]: List[ContentWarning] = [
+            cw for cw in MovieTable.get_all_ContentWarnings(movie_id) if cw is not None
+        ]
+        movie_full_fields["cw"].sort(reverse=True, key=lambda obj: obj.trust)
         movie_full_fields["cw"] = [
-            cw.to_ContentWarningReduced()
-            for cw in MovieTable.get_all_ContentWarnings(movie_id)
-            if cw is not None
+            cw.to_ContentWarningReduced() for cw in movie_full_fields["cw"]
         ]
 
         movie_full_fields["similar"] = []

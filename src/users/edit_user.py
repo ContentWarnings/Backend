@@ -71,4 +71,6 @@ async def edit_user(
     Emailer.send_code_via_email(
         updated_user.email, verification_code, Emailer.VerificationCode.VERIFICATION
     )
-    return "Edited information. Check your email for a new verification code."
+    return {
+        "response": "Edited information. Check your email for a new verification code."
+    }

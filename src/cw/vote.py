@@ -20,7 +20,7 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
 
     if type(retval) is tuple:
         raise HTTPException(retval[0], detail=retval[1])
-    return retval
+    return {"response": retval}
 
 
 @vote_router.get("/cw/{id}/upvote")

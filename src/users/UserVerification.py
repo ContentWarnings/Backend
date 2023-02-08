@@ -12,3 +12,12 @@ class UserVerification(BaseModel):
 
     def jsonify(self):
         return self.__dict__
+
+
+class UserVerificationReduced(BaseModel):
+    """
+    Objects passed in via frontend for verifying
+    """
+
+    email: str
+    code: str

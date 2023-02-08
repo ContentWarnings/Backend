@@ -2,6 +2,7 @@
 # https://github.com/mpdavis/python-jose
 # https://stackoverflow.com/questions/64497615/how-to-add-a-custom-decorator-to-a-fastapi-route
 
+from ..databases.UserTable import UserTable
 import time
 from functools import wraps
 from jose import jwt
@@ -13,6 +14,16 @@ from .util.options import Options
 class Authentication:
     def __init__(self):
         super(Authentication, self).__init__
+
+    def __ensure_user_is_in_database(email: str) -> None:
+        """
+        Tests whether user is currently present within database, raises Exception if not
+        """
+        if UserTable.get_user(email) is None:
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Invalid user in auth token.",
+            )
 
     def admin(func):
         @wraps(func)
@@ -30,6 +41,7 @@ class Authentication:
                     Options.get_secret(),
                     algorithms=Options.get_algorithm(),
                 )
+                Authentication.__ensure_user_is_in_database(payload["email"])
                 is_admin: bool = payload.get("sudo", False)
                 creation_date: float = payload.get("issued", -1)
             except Exception:
@@ -72,7 +84,7 @@ class Authentication:
                     Options.get_secret(),
                     algorithms=Options.get_algorithm(),
                 )
-
+                Authentication.__ensure_user_is_in_database(payload["email"])
                 creation_date: float = payload.get("issued", -1)
             except Exception:
                 raise HTTPException(
