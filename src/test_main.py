@@ -7,8 +7,6 @@ import os
 from .main import app
 from .security.JWT import JWT
 
-# from .databases.UserTable import UserTable
-
 client = TestClient(app)
 
 
@@ -58,6 +56,7 @@ def test_env_variables():
         "JWT_ALGORITHM",
         "JWT_SUDO_LIFETIME",
         "JWT_USER_LIFETIME",
+        "SENDGRID_API_KEY",
     ]
     for key in keys:
         try:

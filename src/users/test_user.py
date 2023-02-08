@@ -68,9 +68,6 @@ def NOtest_account_lifecycle():
     }
     verify_data = client.post("/user/verify", json=verify_code)
 
-    ### REMOVE SOON! This is the force-verification logic.
-    UserTable.set_user_to_verified(creds.get("email"))
-
     # POST /auth/login (verified)
     login_data = client.post("/auth/login", json=creds)
 
