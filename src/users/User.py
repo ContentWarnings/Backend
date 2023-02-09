@@ -29,7 +29,7 @@ class UserReduced(BaseModel):
 
     def to_User(self):
         """
-        Creates a new User object from self
+        Creates a new User object from self.
         """
         return User(
             email=self.email,

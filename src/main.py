@@ -37,7 +37,7 @@ app.include_router(password_reset_op.password_reset_op_router)
 
 @app.get("/")
 def hello():
-    return {"hello": "world"}
+    return {"response": "Hello, world!"}
 
 
 handler = Mangum(app)

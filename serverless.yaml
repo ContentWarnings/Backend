@@ -74,9 +74,9 @@ custom:
 
 package:
   exclude:
-    - "*/*"
+    - "*/**"
   include:
-    - "src/*"
+    - "src/**"
 
 plugins:
   - serverless-python-requirements

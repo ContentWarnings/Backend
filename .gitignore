@@ -1,9 +1,17 @@
+# Local-only files.
 .serverless/
 .vscode/
 .DS_Store
 node_modules
 package-lock.json
+*.pyc
+
+# Files containing secrets
+.env
 
 # include your virtual environment folder here
 virtenv/
 venv/
+
+# References (internal per-person doc)
+divi_references.txt
