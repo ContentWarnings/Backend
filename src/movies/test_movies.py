@@ -87,6 +87,7 @@ def test_post_movie():
     cw_data = {
         "name": "Gun Violence",
         "time": [[120, 270]],
+        "movie_id": 76600,
         "desc": f"This is a placeholder content warning for testing purposes. Test ID: {uuid_run}",
     }
 
