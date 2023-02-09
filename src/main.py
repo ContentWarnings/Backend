@@ -3,6 +3,7 @@
 
 from .cw import edit_cw, get_cw, vote
 from .movies import search, post_cw, get_movie
+from .names import get_names
 from .users import (
     delete_user_op,
     delete_user_request,
@@ -33,6 +34,7 @@ app.include_router(delete_user_request.delete_user_request_router)
 app.include_router(delete_user_op.delete_user_op_router)
 app.include_router(edit_user.edit_user_router)
 app.include_router(password_reset_op.password_reset_op_router)
+app.include_router(get_names.get_names_router)
 
 
 @app.get("/")

@@ -1,16 +1,9 @@
 # References
 # https://stackoverflow.com/questions/64807163/importerror-cannot-import-name-from-partially-initialized-module-m
 
+from .ContentWarningNames import ContentWarningNames
 from pydantic import BaseModel
 from typing import List, Set, Tuple
-
-
-class Nothing(BaseModel):
-    """
-    Represents empty JSON body for certain DELETE calls
-    """
-
-    None
 
 
 class ContentWarningReduced(BaseModel):
@@ -46,7 +39,7 @@ class ContentWarningReduced(BaseModel):
     def jsonify(self):
         return self.__dict__
 
-    name: str
+    name: ContentWarningNames
     id: str  # UUID
     movie_id: int  # TMDB ID
     time: List[Tuple[int, int]]
@@ -54,6 +47,20 @@ class ContentWarningReduced(BaseModel):
 
 
 class ContentWarning(BaseModel):
+    @staticmethod
+    def get_trust_deletion_threshold():
+        """
+        Returns trust score needed to delete CW
+        """
+        return 0.3
+
+    @staticmethod
+    def get_num_downvotes_deletion_threshold():
+        """
+        Returns number of downvotes needed to delete CW
+        """
+        return 5
+
     def to_ContentWarningReduced(self) -> ContentWarningReduced:
         """
         Creates a new ContentWarningReduced object from self
@@ -99,7 +106,7 @@ class ContentWarning(BaseModel):
         else:
             self.trust = numerator / denominator
 
-    name: str
+    name: ContentWarningNames
     id: str  # UUID
     movie_id: int  # TMDB ID
     time: List[Tuple[int, int]]

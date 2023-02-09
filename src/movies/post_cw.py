@@ -6,6 +6,7 @@
 import boto3
 from ..security.Authentication import Authentication
 from ..security.JWT import JWT
+from ..security.ProfanityChecker import ProfanityChecker
 from ..cw.ContentWarning import ContentWarningReduced
 from ..databases.ContentWarningTable import ContentWarningTable
 from ..databases.MovieTable import MovieTable
@@ -31,6 +32,8 @@ async def post_cw(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No content warning object given.",
         )
+
+    ProfanityChecker.check_string(root.desc)
 
     # add cw to CW table
     result = ContentWarningTable.add_warning(root.to_ContentWarning())

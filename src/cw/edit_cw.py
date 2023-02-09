@@ -7,10 +7,11 @@ from ..databases.ContentWarningTable import ContentWarningTable
 from ..databases.UserTable import UserTable
 from ..security.Authentication import Authentication
 from ..security.JWT import JWT
-from .ContentWarning import ContentWarningReduced, Nothing
+from ..security.ProfanityChecker import ProfanityChecker
+from .ContentWarning import ContentWarningReduced, ContentWarningNames
 from fastapi import APIRouter, Depends, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from typing import Optional, Union
+from typing import Optional
 
 edit_cw_router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -22,7 +23,7 @@ async def edit_cw(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
     cw_id: str = None,
-    root: Union[ContentWarningReduced, Nothing] = None,
+    root: ContentWarningReduced = None,
 ) -> ContentWarningReduced:
     if cw_id is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No CW ID given.")
@@ -45,9 +46,9 @@ async def edit_cw(
             detail=f"no CW exists with ID {cw_id}",
         )
 
-    # if JSON body is passed in empty, we are to delete cw from CW table,
+    # if "None" is passed as CW name, we are to delete cw from CW table,
     # movies table, and user table, returning appropriate JSON on results
-    if type(root) is Nothing:
+    if root.name == ContentWarningNames.None_Type:
         res1 = MovieTable.delete_warning_from_movie(cw.movie_id, cw.id)
         res2 = ContentWarningTable.delete_warning(cw_id)
 
@@ -58,6 +59,8 @@ async def edit_cw(
         res1.update(res3)
 
         return res1
+
+    ProfanityChecker.check_string(root.desc)
 
     # if JSON body is a valid cw, we edit it
     result = ContentWarningTable.edit_warning(root.to_ContentWarning())

@@ -2,6 +2,8 @@
 # https://stackoverflow.com/questions/60098005/fastapi-starlette-get-client-real-ip
 # https://fastapi.tiangolo.com/advanced/using-request-directly/
 
+from ..cw.ContentWarning import ContentWarning
+from ..databases.MovieTable import MovieTable
 from ..databases.ContentWarningTable import ContentWarningTable
 from ..security.Sha256 import Sha256
 from fastapi import APIRouter, HTTPException, Request
@@ -20,6 +22,26 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
 
     if type(retval) is tuple:
         raise HTTPException(retval[0], detail=retval[1])
+
+    # if downvoting lowers trust enough & sufficient downvotes -> remove CW
+    if not upvote:
+        cw = ContentWarningTable.get_warning(cw_id)
+
+        if cw is not None:
+            if (
+                cw.trust < ContentWarning.get_trust_deletion_threshold()
+                and len(cw.downvotes)
+                >= ContentWarning.get_num_downvotes_deletion_threshold()
+            ):
+                print(f"Trust of CW {cw.id} is too low. Deleting.")
+
+                # yes, technically, we don't delete CW from user table, but the ID will refer
+                # to nothing in the other tables, so it's effectively deleted. We can't delete
+                # the CW reference in user table unless we scan every user in the database. This
+                # will suffice for now, and runtime penalties are basically non-existent.
+                MovieTable.delete_warning_from_movie(cw.movie_id, cw.id)
+                ContentWarningTable.delete_warning(cw.id)
+
     return {"response": retval}
 
 

@@ -6,6 +6,7 @@
 
 from fastapi import status
 from ..cw.ContentWarning import ContentWarning
+from ..cw.ContentWarningNames import ContentWarningNames
 import boto3
 import os
 from typing import Dict, Tuple, Union
@@ -19,7 +20,7 @@ class ContentWarningTable:
     @staticmethod
     def __itemize_ContentWarning_to_db_entry(cw: ContentWarning) -> dict:
         return {
-            "name": {"S": cw.name},
+            "name": {"S": cw.name.value},
             "id": {"S": cw.id},
             "movie_id": {"N": str(cw.movie_id)},
             "time": {"L": [{"S": str(entry)} for entry in cw.time]},
@@ -40,7 +41,7 @@ class ContentWarningTable:
             return item
 
         return ContentWarning(
-            name=item["name"]["S"],
+            name=ContentWarningNames(item["name"]["S"]),
             id=item["id"]["S"],
             movie_id=item["movie_id"]["N"],
             time=[
