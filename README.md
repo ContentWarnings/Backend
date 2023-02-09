@@ -12,11 +12,12 @@ This is the home for our Python/FastAPI AWS backend for senior design. Please re
 - Install [Serverless Framework](https://www.serverless.com/).
 
 ```sh
-# Install dependencies (Debian-likes)
+# Install dependencies (Ubuntu)
 sudo apt-get install python3.8 python3.8-venv
 
-# Install Serverless CLI
+# Install Serverless CLI + plugins
 npm install -g serverless
+serverless plugin install -n serverless-python-requirements
 ```
 
 
@@ -62,10 +63,21 @@ source venv/bin/activate
 # Run Black to make sure formatting is compliant.
 black src/*
 
+# Run Pytest tests
+pytest
+
 # Push to Git.
 git add .
 git commit -m "Push bug fix"
 git push origin adam/bug-fix
+```
+
+## Local Development Guide
+
+```sh
+# (in project root)
+python3 -m pip install gunicorn
+python3 -m gunicorn src.main:app --worker-class uvicorn.workers.UvicornWorker
 ```
 
 # Citation Guide

@@ -39,7 +39,7 @@ app.include_router(get_names.get_names_router)
 
 @app.get("/")
 def hello():
-    return {"hello": "world"}
+    return {"response": "Hello, world!"}
 
 
 handler = Mangum(app)
