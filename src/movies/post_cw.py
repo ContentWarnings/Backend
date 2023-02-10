@@ -7,7 +7,7 @@ import boto3
 from ..security.Authentication import Authentication
 from ..security.JWT import JWT
 from ..security.ProfanityChecker import ProfanityChecker
-from ..cw.ContentWarning import ContentWarningReduced
+from ..cw.ContentWarning import ContentWarningReduced, ContentWarningPosting
 from ..databases.ContentWarningTable import ContentWarningTable
 from ..databases.MovieTable import MovieTable
 from ..databases.UserTable import UserTable
@@ -25,7 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def post_cw(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
-    root: ContentWarningReduced = None,
+    root: ContentWarningPosting = None,
 ) -> Dict[ContentWarningReduced, Dict[str, str]]:
     if root is None:
         raise HTTPException(
@@ -36,7 +36,8 @@ async def post_cw(
     ProfanityChecker.check_string(root.desc)
 
     # add cw to CW table
-    result = ContentWarningTable.add_warning(root.to_ContentWarning())
+    full_cw = root.to_ContentWarningReduced().to_ContentWarning()
+    result = ContentWarningTable.add_warning(full_cw)
     if type(result) is tuple:
         raise HTTPException(status_code=result[0], detail=result[1])
 
@@ -48,11 +49,11 @@ async def post_cw(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User does not exist or invalid session token.",
         )
-    user.contributions.append(root.id)
+    user.contributions.append(full_cw.id)
     UserTable.edit_user(user)
 
     # add cw UUID to appropriate movie, creating entry if not inside movie table
-    cw_ids: List[str] = MovieTable.add_warning_to_movie(root.movie_id, root.id)
+    cw_ids: List[str] = MovieTable.add_warning_to_movie(full_cw.movie_id, full_cw.id)
 
     retval_cw_list: List[dict] = []
     for cw_id in cw_ids:

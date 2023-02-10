@@ -4,11 +4,12 @@
 from .ContentWarningNames import ContentWarningNames
 from pydantic import BaseModel
 from typing import List, Set, Tuple
+import uuid
 
 
 class ContentWarningReduced(BaseModel):
     """
-    These are the objects which our API receives via calls, since we do not give access to
+    These are the objects which our API typically sends via requests, since we do not give access to
     upvotes, downvotes, and trust score. Hence, this is a reduced version of our DB schema.
     """
 
@@ -47,6 +48,17 @@ class ContentWarningReduced(BaseModel):
 
 
 class ContentWarning(BaseModel):
+    """
+    Constructs we store in our tables
+    """
+
+    @staticmethod
+    def generate_ID() -> str:
+        """
+        Generates a new CW ID
+        """
+        return str(uuid.uuid4())
+
     @staticmethod
     def get_trust_deletion_threshold():
         """
@@ -116,3 +128,31 @@ class ContentWarning(BaseModel):
     trust: float  # continuous scale on [0, 1]
     upvotes: Set[str]  # hashed IP addresses
     downvotes: Set[str]  # hashed IP addresses
+
+
+class ContentWarningPosting(BaseModel):
+    """
+    Objects API receives via posts/edits, contains everything CWReduced has, except ID field
+    """
+
+    def to_ContentWarningReduced(self, id: int = None) -> ContentWarningReduced:
+        """
+        Creates a new ContentWarningReduced object from self, if no ID is specified, a new one
+        is created
+        """
+
+        return ContentWarningReduced(
+            name=self.name,
+            id=ContentWarning.generate_ID() if id is None else id,
+            movie_id=self.movie_id,
+            time=self.time,
+            desc=self.desc,
+        )
+
+    def jsonify(self):
+        return self.__dict__
+
+    name: ContentWarningNames
+    movie_id: int  # TMDB ID
+    time: List[Tuple[int, int]]
+    desc: str

@@ -7,10 +7,11 @@
 from fastapi import status
 from ..cw.ContentWarning import ContentWarning
 from ..cw.ContentWarningNames import ContentWarningNames
+from ..users.User import User
 import boto3
 import os
 from typing import Dict, Tuple, Union
-from fastapi import status
+from fastapi import HTTPException, status
 
 
 class ContentWarningTable:
@@ -114,6 +115,17 @@ class ContentWarningTable:
             else "failed to delete"
         )
         return {message: cw_id}
+
+    @staticmethod
+    def ensure_user_can_edit_cw(user: User, cw: ContentWarning) -> None:
+        """
+        Verifies whether user can edit specified CW (whether they own it), if not, raise exception
+        """
+        if cw.id not in user.contributions:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User must own CW to edit it.",
+            )
 
     @staticmethod
     def __voting_op(cw_id: str, hashed_ip_address: str, is_upvote: bool):
