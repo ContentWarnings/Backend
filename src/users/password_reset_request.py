@@ -21,4 +21,4 @@ def password_reset_request(email: str) -> str:
         email, pw_reset_code, Emailer.VerificationCode.PASSWORD_RESET
     )
 
-    return "Check your email for a password reset code."
+    return {"response": "Check your email for a password reset code."}

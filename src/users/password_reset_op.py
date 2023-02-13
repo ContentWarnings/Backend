@@ -32,4 +32,4 @@ def password_reset_op(user_reset: UserPasswordReset) -> str:
 
     user.password = Bcrypter.hash_password(user_reset.new_password)
     UserTable.edit_user(user)
-    return "New password has been added."
+    return {"response": "New password has been added."}

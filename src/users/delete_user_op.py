@@ -31,8 +31,9 @@ async def delete_user_op(
         )
 
     if deletion_code != user_verification_obj.deletion_code:
-        return "Incorrect deletion code."
+        return {"response": "Incorrect deletion code."}
 
     # delete user from both tables
     UserVerificationTable.delete_user_verification_obj(email)
-    return UserTable.delete_user(email)
+    response_msg = UserTable.delete_user(email)
+    return {"response": response_msg}

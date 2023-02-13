@@ -1,3 +1,4 @@
+from .ContentWarningTable import ContentWarningTable
 from ..security.Bcrypter import Bcrypter
 from ..users.User import User, UserReduced
 import boto3
@@ -18,6 +19,7 @@ class UserTable:
     def __parse_db_entry_to_User(item: dict) -> User:
         return User(
             email=item["email"]["S"],
+            new_pending_email=item["new_pending_email"]["S"],
             password=item["password"]["S"],
             verified=item["verified"]["BOOL"],
             contributions=[entry["S"] for entry in item["contributions"]["L"]],
@@ -27,6 +29,7 @@ class UserTable:
     def __itemize_User_to_db_entry(user: User) -> dict:
         return {
             "email": {"S": user.email},
+            "new_pending_email": {"S": user.new_pending_email},
             "password": {"S": user.password},
             "verified": {"BOOL": user.verified},
             "contributions": {"L": [{"S": cw_id} for cw_id in user.contributions]},
@@ -121,6 +124,28 @@ class UserTable:
             TableName=UserTable.USER_TABLE,
             Item=UserTable.__itemize_User_to_db_entry(user),
         )
+
+    @staticmethod
+    def prune_cw_list(user_email: str) -> None:
+        """
+        Prunes CWs that point to nowhere in CW table
+        """
+        user = UserTable.get_user(user_email)
+        if user is None:
+            return
+
+        new_cw_list = [
+            cw_id
+            for cw_id in user.contributions
+            if ContentWarningTable.get_warning(cw_id) is not None
+        ]
+
+        if len(new_cw_list) != len(user.contributions):
+            user.contributions = new_cw_list
+            UserTable.DYNAMO_DB_CLIENT.put_item(
+                TableName=UserTable.USER_TABLE,
+                Item=UserTable.__itemize_User_to_db_entry(user),
+            )
 
     @staticmethod
     def delete_cw(user_email: str, cw_id: str) -> Dict[str, str]:

@@ -14,6 +14,7 @@ class User(BaseModel):
         return UserReduced(email=self.email, password=self.password)
 
     email: str
+    new_pending_email: str  # if user requests new email, populate it here until verified
     password: str  # salted and bcrypt-hashed
     verified: bool  # email verified or not
     contributions: List[str]  # UUIDs for content warnings submitted
@@ -33,6 +34,7 @@ class UserReduced(BaseModel):
         """
         return User(
             email=self.email,
+            new_pending_email="",
             password=self.password,
             verified=False,
             contributions=list(),

@@ -27,4 +27,4 @@ async def delete_user_request(
 
     Emailer.send_code_via_email(email, deletion_code, Emailer.VerificationCode.DELETION)
 
-    return "Check your email for a deletion reset code."
+    return {"response": "Check your email for a deletion reset code."}

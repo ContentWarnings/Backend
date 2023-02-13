@@ -1,5 +1,6 @@
 anyio==3.6.1
 attrs==22.2.0
+better-profanity==0.7.0
 black==22.10.0
 boto3==1.24.94
 botocore==1.27.94

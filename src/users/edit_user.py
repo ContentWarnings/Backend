@@ -35,13 +35,13 @@ async def edit_user(
     emails_match = True if prev_user.email == incoming_user.email else False
 
     if passwords_match and emails_match:
-        return "No changes to user information."
+        return {"response": "No changes to user information."}
 
     # 1. changing just password
     if emails_match:
         prev_user.password = Bcrypter.hash_password(incoming_user.password)
         UserTable.edit_user(prev_user)
-        return "Edited password."
+        return {"response": "Edited password."}
 
     # before going on, check that specified email doesn't exist for another user
     if UserTable.get_user(incoming_user.email):
@@ -51,24 +51,38 @@ async def edit_user(
         )
 
     # 2. changing email and maybe password, too
-    # this means we basically clone old user into a new object, delete old object, and re-add "new"
-    # user, because this means they need to go thru verification again if email changes
+    # if email is changed, we add temporary email to user's database object until it's verified
 
     # first, verify new email
     Emailer.perform_email_validation(incoming_user.email)
 
-    UserVerificationTable.delete_user_verification_obj(prev_user.email)
-    UserTable.delete_user(prev_user.email)
+    # if new email request is different from pending request, delete pending uv obj from database
+    if (
+        len(prev_user.new_pending_email) != 0
+        and prev_user.new_pending_email != incoming_user.email
+    ):
+        UserVerificationTable.delete_user_verification_obj(prev_user.new_pending_email)
 
-    updated_user = incoming_user.to_User()
-    updated_user.contributions = prev_user.contributions  # copy over CW IDs
+    verif_code = CodeGenerator.create_new_verification_code()
 
-    # add to both tables
-    verification_code = CodeGenerator.create_new_verification_code()
-    UserVerificationTable.add_user(updated_user.email, verif_code=verification_code)
-    UserTable.add_user_obj(updated_user)
+    # if the pending email already has a UV obj entry, update it, if not, add new entry to database
+    if UserVerificationTable.get_user_verification_obj(incoming_user.email) is None:
+        UserVerificationTable.add_user(incoming_user.email, verif_code=verif_code)
+    else:
+        UserVerificationTable.add_new_verification_code_to_user(
+            incoming_user.email, verif_code=verif_code
+        )
+
+    # update current user with pending email and/or hashed password
+    prev_user.new_pending_email = incoming_user.email
+    if not passwords_match:
+        prev_user.password = Bcrypter.hash_password(incoming_user.password)
+    UserTable.edit_user(prev_user)
 
     Emailer.send_code_via_email(
-        updated_user.email, verification_code, Emailer.VerificationCode.VERIFICATION
+        incoming_user.email, verif_code, Emailer.VerificationCode.VERIFICATION
     )
-    return "Edited information. Check your email for a new verification code."
+
+    return {
+        "response": "Edited information. Check your email for a new verification code."
+    }

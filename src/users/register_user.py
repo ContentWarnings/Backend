@@ -35,4 +35,4 @@ def register_user(user: UserReduced):
         user.email, verif_code, Emailer.VerificationCode.VERIFICATION
     )
 
-    # TODO: JSON response
+    return {"response": "Please check your email for a verification code."}

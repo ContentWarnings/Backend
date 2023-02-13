@@ -6,7 +6,8 @@
 import boto3
 from ..security.Authentication import Authentication
 from ..security.JWT import JWT
-from ..cw.ContentWarning import ContentWarningReduced
+from ..security.ProfanityChecker import ProfanityChecker
+from ..cw.ContentWarning import ContentWarningReduced, ContentWarningPosting
 from ..databases.ContentWarningTable import ContentWarningTable
 from ..databases.MovieTable import MovieTable
 from ..databases.UserTable import UserTable
@@ -19,33 +20,24 @@ dynamodb_client = boto3.client("dynamodb")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-@post_cw_router.post("/movie/{id}")
+@post_cw_router.post("/movie")
 @Authentication.member
 async def post_cw(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
-    id: int = None,
-    root: ContentWarningReduced = None,
+    root: ContentWarningPosting = None,
 ) -> Dict[ContentWarningReduced, Dict[str, str]]:
-    if id is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No movie ID given."
-        )
-
     if root is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No content warning object given.",
         )
 
-    if id != root.movie_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"CW movie ID {root.movie_id} != endpoint movie ID {id}",
-        )
+    ProfanityChecker.check_string(root.desc)
 
     # add cw to CW table
-    result = ContentWarningTable.add_warning(root.to_ContentWarning())
+    full_cw = root.to_ContentWarningReduced().to_ContentWarning()
+    result = ContentWarningTable.add_warning(full_cw)
     if type(result) is tuple:
         raise HTTPException(status_code=result[0], detail=result[1])
 
@@ -57,11 +49,11 @@ async def post_cw(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User does not exist or invalid session token.",
         )
-    user.contributions.append(root.id)
+    user.contributions.append(full_cw.id)
     UserTable.edit_user(user)
 
     # add cw UUID to appropriate movie, creating entry if not inside movie table
-    cw_ids: List[str] = MovieTable.add_warning_to_movie(id, root.id)
+    cw_ids: List[str] = MovieTable.add_warning_to_movie(full_cw.movie_id, full_cw.id)
 
     retval_cw_list: List[dict] = []
     for cw_id in cw_ids:
