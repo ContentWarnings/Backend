@@ -16,5 +16,9 @@ async def get_user(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
 ) -> UserExported:
-    user = UserTable.get_user_from_decoded_jwt(JWT.get_email(token))
-    return UserExported.create(user).jsonify()
+    email = JWT.get_email(token)
+
+    # before obtaining user, prune any dead CWs
+    UserTable.prune_cw_list(email)
+
+    return UserExported.create(UserTable.get_user_from_decoded_jwt(email)).jsonify()

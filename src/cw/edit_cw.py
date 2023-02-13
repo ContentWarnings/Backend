@@ -58,6 +58,9 @@ async def edit_cw(
         email = JWT.get_email(token)
         res3 = UserTable.delete_cw(email, cw_id)
 
+        # after deleting CW, prune if need be
+        UserTable.prune_cw_list(email)
+
         res1.update(res2)
         res1.update(res3)
 
