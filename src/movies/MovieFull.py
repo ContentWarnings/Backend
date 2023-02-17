@@ -1,6 +1,7 @@
 # References
 # https://www.w3schools.com/python/ref_list_sort.asp
 
+from .StreamingInfo import StreamingInfo
 from .PosterPath import PosterPath
 from ..databases.MovieTable import MovieTable
 from ..cw.ContentWarning import ContentWarningReduced, ContentWarning
@@ -8,7 +9,7 @@ from .MovieReduced import MovieReduced
 from ..tmdb.tmdb import TMDB
 import json
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 
 
 class MovieFull(BaseModel):
@@ -48,6 +49,7 @@ class MovieFull(BaseModel):
             ("original_language", "lang"),
             (None, "cw"),
             (None, "similar"),
+            (None, "streaming_info"),
         ]
 
         movie_full_fields = dict()
@@ -106,6 +108,9 @@ class MovieFull(BaseModel):
                 continue
             movie_full_fields[k] = PosterPath.create_poster_link(movie_full_fields[k])
 
+        # add streaming information
+        movie_full_fields["streaming_info"] = TMDB.get_streaming_providers(movie_id)
+
         # pydantic complains if fields are null
         for k, v in MovieFull.__fields__.items():
             if movie_full_fields[k] is None or (
@@ -138,3 +143,4 @@ class MovieFull(BaseModel):
     lang: str
     cw: List[ContentWarningReduced]
     similar: List[MovieReduced]
+    streaming_info: Union[StreamingInfo, None]
