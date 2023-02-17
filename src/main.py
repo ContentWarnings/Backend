@@ -1,5 +1,6 @@
 # References
 # https://github.com/jordaneremieff/serverless-mangum-examples/
+# https://fastapi.tiangolo.com/tutorial/cors/?h=%20cors#use-corsmiddleware
 
 from .cw import edit_cw, get_cw, vote
 from .movies import search, post_cw, get_movie
@@ -16,6 +17,7 @@ from .users import (
     password_reset_request,
 )
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
 app = FastAPI()
@@ -35,6 +37,15 @@ app.include_router(delete_user_op.delete_user_op_router)
 app.include_router(edit_user.edit_user_router)
 app.include_router(password_reset_op.password_reset_op_router)
 app.include_router(get_names.get_names_router)
+
+# we're allowing any websites to hit this for now
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
