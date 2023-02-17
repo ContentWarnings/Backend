@@ -2,7 +2,7 @@
 # https://github.com/jordaneremieff/serverless-mangum-examples/
 # https://fastapi.tiangolo.com/tutorial/cors/?h=%20cors#use-corsmiddleware
 
-from .cw import edit_cw, get_cw, vote
+from .cw import edit_cw, get_cw, vote, has_voted
 from .movies import search, post_cw, get_movie
 from .names import get_names
 from .users import (
@@ -37,6 +37,7 @@ app.include_router(delete_user_op.delete_user_op_router)
 app.include_router(edit_user.edit_user_router)
 app.include_router(password_reset_op.password_reset_op_router)
 app.include_router(get_names.get_names_router)
+app.include_router(has_voted.has_voted_router)
 
 # we're allowing any websites to hit this for now
 app.add_middleware(
