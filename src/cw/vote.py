@@ -5,6 +5,7 @@
 from ..cw.ContentWarning import ContentWarning
 from ..databases.MovieTable import MovieTable
 from ..databases.ContentWarningTable import ContentWarningTable
+from ..security.IPAddress import IPAddress
 from ..security.Sha256 import Sha256
 from fastapi import APIRouter, HTTPException, Request
 
@@ -47,9 +48,9 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
 
 @vote_router.get("/cw/{id}/upvote")
 def upvote(id: str, request: Request) -> str:
-    return __vote_helper(id, request.client.host, upvote=True)
+    return __vote_helper(id, IPAddress.get_ip_address(request), upvote=True)
 
 
 @vote_router.get("/cw/{id}/downvote")
 def downvote(id: str, request: Request) -> str:
-    return __vote_helper(id, request.client.host, upvote=False)
+    return __vote_helper(id, IPAddress.get_ip_address(request), upvote=False)

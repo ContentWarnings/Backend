@@ -4,10 +4,13 @@
 # https://www.themoviedb.org/talk/5d588e585cc11d00125ff1f1
 # https://pypi.org/project/python-dotenv/
 
+from ..movies.PosterPath import PosterPath
+from ..movies.StreamingInfo import StreamingInfo
 from dotenv import load_dotenv
 import json
 import requests
 import os
+from typing import List, Union, Tuple
 
 
 class TMDB:
@@ -66,3 +69,56 @@ class TMDB:
                 break
 
         return rating
+
+    @staticmethod
+    def get_streaming_providers(movie_id: int) -> Union[StreamingInfo, None]:
+        """
+        Returns streaming provider info for a given movie (US only), None if no results
+        """
+
+        def get_streamers_per_type(
+            results: dict, streamer_type: str
+        ) -> List[Tuple[str, str]]:
+            retval = []
+            if streamer_type not in results.keys():
+                return retval
+
+            for entry in results[streamer_type]:
+                retval.append(
+                    (
+                        entry["provider_name"] + str(" - ") + streamer_type,
+                        PosterPath.create_poster_link(entry["logo_path"]),
+                    )
+                )
+
+            return retval
+
+        response = TMDB.hit_api(f"movie/{movie_id}/watch/providers")
+
+        if not response.ok:
+            return None
+
+        results: dict = TMDB.jsonify_response(response).get("results")
+
+        # nothing in here!
+        if len(results) == 0:
+            print("No streaming results at all.")
+            return None
+
+        # US not present in streaming list
+        if "US" not in results.keys():
+            print("No US streaming information.")
+            return None
+
+        results: dict = results["US"]
+
+        tmdb_link = ""
+        if "link" in results:
+            tmdb_link = results["link"]
+
+        streamers = []
+        streamers.extend(get_streamers_per_type(results, "flatrate"))
+        streamers.extend(get_streamers_per_type(results, "rent"))
+        streamers.extend(get_streamers_per_type(results, "buy"))
+
+        return StreamingInfo(providers=streamers, tmdb_link=tmdb_link)
