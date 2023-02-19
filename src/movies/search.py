@@ -38,12 +38,21 @@ def search(
     response = (
         get_trending_movies()
         if q is None
-        else TMDB.hit_api("search/movie/", f"&query={q}&page={p}")
+        else TMDB.hit_api("search/movie", f"&query={q}&page={p}")
     )
 
-    json_map = json.loads(response.text)
+    json_map: dict = json.loads(response.text)
 
     movies_list: List[MovieReduced] = []
+
+    # return empty list if no results
+    if "results" not in json_map.keys():
+        # logging
+        print("No results for TMDB search.")
+        print(json_map)
+        
+        return {"results": []}
+
     for val in json_map["results"]:
         if genre != Genre.Disregard:
             if GENRE_MAP[genre] not in val["genre_ids"]:
