@@ -10,7 +10,4 @@ def get_all_cw_names(request: Request):
     Returns an ordered list of CW names/types
     """
 
-    # TODO: remove, this is just for testing purposes
-    print(request.headers)
-
     return {"cws": [name.value for name in ContentWarningNames]}
