@@ -7,7 +7,11 @@
 
 from ..tmdb.tmdb import TMDB
 from ..tmdb.genres import Genre, GENRE_MAP
-from .MovieReduced import MovieReduced, MovieReducedFields
+from .MovieReduced import (
+    MovieReduced,
+    MovieReducedFields,
+    from_MovieReducedFields_to_raw_field,
+)
 import boto3
 from fastapi import APIRouter
 import json
@@ -32,7 +36,7 @@ def get_trending_movies() -> requests.Response:
 def search(
     q: Union[str, None] = None,
     p: int = 1,
-    sort: MovieReducedFields = MovieReducedFields.title,
+    sort: MovieReducedFields = MovieReducedFields.default_ascending,
     genre: Genre = Genre.Disregard,
 ):
     response = (
@@ -50,7 +54,7 @@ def search(
         # logging
         print("No results for TMDB search.")
         print(json_map)
-        
+
         return {"results": []}
 
     for val in json_map["results"]:
@@ -59,6 +63,30 @@ def search(
                 continue
         movies_list.append(MovieReduced.create(val))
 
-    movies_list = sorted(movies_list, key=lambda o: o.jsonify()[sort.value])
+    # sort if necessary
+    if sort not in [
+        MovieReducedFields.default_descending,
+        MovieReducedFields.default_descending,
+    ]:
+        movies_list = sorted(
+            movies_list,
+            key=lambda o: o.jsonify()[from_MovieReducedFields_to_raw_field(sort)],
+        )
+
+    # reverse list if sort is descending order
+    if sort in [
+        MovieReducedFields.id_descending,
+        MovieReducedFields.title_descending,
+        MovieReducedFields.release_descending,
+        MovieReducedFields.img_descending,
+        MovieReducedFields.mpa_descending,
+        MovieReducedFields.rating_descending,
+        MovieReducedFields.overview_descending,
+        MovieReducedFields.runtime_descending,
+        MovieReducedFields.genres_descending,
+        MovieReducedFields.cw_descending,
+        MovieReducedFields.default_descending,
+    ]:
+        movies_list.reverse()
 
     return {"results": [val.jsonify() for val in movies_list]}

@@ -11,16 +11,52 @@ from typing import Dict, List
 
 
 class MovieReducedFields(str, Enum):
-    id = "id"
-    title = "title"
-    release = "release"
-    img = "img"
-    mpa = "mpa"
-    rating = "rating"
-    overview = "overview"
-    runtime = "runtime"
-    genres = "genres"
-    cw = "cw"
+    id_ascending = "id_ascending"
+    id_descending = "id_descending"
+
+    title_ascending = "title_ascending"
+    title_descending = "title_descending"
+
+    release_ascending = "release_ascending"
+    release_descending = "release_descending"
+
+    img_ascending = "img_ascending"
+    img_descending = "img_descending"
+
+    mpa_ascending = "mpa_ascending"
+    mpa_descending = "mpa_descending"
+
+    rating_ascending = "rating_ascending"
+    rating_descending = "rating_descending"
+
+    overview_ascending = "overview_ascending"
+    overview_descending = "overview_descending"
+
+    runtime_ascending = "runtime_ascending"
+    runtime_descending = "runtime_descending"
+
+    genres_ascending = "genres_ascending"
+    genres_descending = "genres_descending"
+
+    cw_ascending = "cw_ascending"
+    cw_descending = "cw_descending"
+
+    default_ascending = "default_ascending"
+    default_descending = "default_descending"
+
+
+def from_MovieReducedFields_to_raw_field(
+    movie_reduced_field: MovieReducedFields,
+) -> str:
+    """
+    Extracts raw MovieReduced field from the MovieReducedFields enum
+    (basically removes underscore and suffix)
+
+    Example: default_descending -> default
+    """
+
+    raw_val: str = movie_reduced_field.value
+    return raw_val.split("_")[0]
 
 
 class MovieReduced(BaseModel):
