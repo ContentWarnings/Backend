@@ -1,11 +1,11 @@
 from ..cw.ContentWarningNames import ContentWarningNames
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
 get_names_router = APIRouter()
 
 
 @get_names_router.get("/names")
-def get_all_cw_names(request: Request):
+def get_all_cw_names():
     """
     Returns an ordered list of CW names/types
     """
