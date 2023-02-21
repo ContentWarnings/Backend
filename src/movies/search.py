@@ -66,7 +66,7 @@ def search(
     # sort if necessary
     if sort not in [
         MovieReducedFields.default_descending,
-        MovieReducedFields.default_descending,
+        MovieReducedFields.default_ascending,
     ]:
         movies_list = sorted(
             movies_list,
