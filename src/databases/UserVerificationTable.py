@@ -107,11 +107,11 @@ class UserVerificationTable:
         )
 
     @staticmethod
-    def log_invalid_email(email: str) -> None:
+    def log_invalid_email() -> None:
         """
         To protect security of users, we will return success codes even with invalid emails,
         but we still log info to backend
         """
         print(
-            f"Invalid email '{email}' given for reset code purposes, but returning success for user security."
+            f"Invalid email given for reset code purposes, but returning success for user security."
         )

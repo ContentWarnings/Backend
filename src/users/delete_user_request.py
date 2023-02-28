@@ -26,7 +26,7 @@ async def delete_user_request(
     )
 
     if type(retval) is tuple:
-        UserVerificationTable.log_invalid_email(email)
+        UserVerificationTable.log_invalid_email()
         return json_response
 
     Emailer.send_code_via_email(email, deletion_code, Emailer.VerificationCode.DELETION)

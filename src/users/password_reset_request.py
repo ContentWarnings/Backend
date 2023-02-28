@@ -18,7 +18,7 @@ def password_reset_request(email: str) -> str:
     )
 
     if type(retval) is tuple:
-        UserVerificationTable.log_invalid_email(email)
+        UserVerificationTable.log_invalid_email()
         return json_response
 
     Emailer.send_code_via_email(
