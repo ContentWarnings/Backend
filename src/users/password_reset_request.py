@@ -9,16 +9,20 @@ password_reset_request_router = APIRouter()
 
 @password_reset_request_router.get("/user/password-reset-request")
 def password_reset_request(email: str) -> str:
+    json_response = {"response": "Check your email for a password reset code."}
+
     # create a new verification code for the user
     pw_reset_code = CodeGenerator.create_new_verification_code()
     retval = UserVerificationTable.add_new_verification_code_to_user(
         email, verif_code=pw_reset_code
     )
+
     if type(retval) is tuple:
-        raise HTTPException(status_code=retval[0], detail=retval[1])
+        UserVerificationTable.log_invalid_email()
+        return json_response
 
     Emailer.send_code_via_email(
         email, pw_reset_code, Emailer.VerificationCode.PASSWORD_RESET
     )
 
-    return {"response": "Check your email for a password reset code."}
+    return json_response

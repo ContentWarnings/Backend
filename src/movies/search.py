@@ -39,9 +39,10 @@ def search(
     sort: MovieReducedFields = MovieReducedFields.default_ascending,
     genre: Genre = Genre.Disregard,
 ):
+    # retrieve trending movies if query string is null or empty
     response = (
         get_trending_movies()
-        if q is None
+        if q is None or len(q.strip()) == 0
         else TMDB.hit_api("search/movie", f"&query={q}&page={p}")
     )
 
