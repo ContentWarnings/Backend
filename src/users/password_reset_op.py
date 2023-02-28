@@ -12,6 +12,10 @@ password_reset_op_router = APIRouter()
 
 @password_reset_op_router.post("/user/password-reset-op")
 def password_reset_op(user_reset: UserPasswordReset) -> str:
+    """
+    Performs password reset operation, returning string of operation status
+    """
+
     uv_obj = UserVerificationTable.get_user_verification_obj(user_reset.email)
     if uv_obj is None:
         raise HTTPException(

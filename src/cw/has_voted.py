@@ -15,6 +15,10 @@ class VotedOptions(str, Enum):
 
 @has_voted_router.get("/cw/{id}/has-voted")
 def has_voted(id: str, request: Request):
+    """
+    Given CW ID, has caller IP address upvoted, downvoted, or not interacted?
+    Returns VotedOptions enum.
+    """
     hashed_ip_address = Sha256.hash(IPAddress.get_ip_address(request))
     vote_option: VotedOptions = VotedOptions.nothing
 

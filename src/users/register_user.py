@@ -10,6 +10,10 @@ register_user_router = APIRouter()
 
 @register_user_router.post("/user/register")
 def register_user(user: UserReduced):
+    """
+    Registers a user, returning a string specifying to check one's email
+    """
+
     # check if user already exists
     if UserTable.get_user(user.email) is not None:
         raise HTTPException(

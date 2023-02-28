@@ -28,7 +28,8 @@ def complete_new_email_verif_process(user: User) -> None:
 @verify_user_router.post("/user/verify")
 def verify_user(uv_obj: UserVerificationReduced):
     """
-    With input of specified user email and verification code, performs user verification
+    With input of specified user email and verification code, performs user verification.
+    Returns result string specifying operation status.
     """
     user_verification_obj = UserVerificationTable.get_user_verification_obj(
         uv_obj.email

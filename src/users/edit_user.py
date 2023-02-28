@@ -21,6 +21,9 @@ async def edit_user(
     token: Optional[str] = Depends(oauth2_scheme),
     incoming_user: UserReduced = None,
 ) -> str:
+    """
+    Edits user info, returning string of operation status
+    """
     if incoming_user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

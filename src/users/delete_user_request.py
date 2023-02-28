@@ -17,6 +17,10 @@ async def delete_user_request(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
 ) -> str:
+    """
+    Sends delete request email, returns string of operation status
+    """
+
     json_response = {"response": "Check your email for a deletion reset code."}
 
     email = JWT.get_email(token)

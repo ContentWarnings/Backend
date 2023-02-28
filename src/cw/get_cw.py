@@ -7,7 +7,10 @@ get_cw_router = APIRouter()
 
 
 @get_cw_router.get("/cw/{id}")
-def get_cw(id: str) -> Union[ContentWarningReduced, None]:
+def get_cw(id: str):
+    """
+    Given CW ID, returns ContentWarningReduced
+    """
     warning = ContentWarningTable.get_warning(id)
 
     if warning is None:

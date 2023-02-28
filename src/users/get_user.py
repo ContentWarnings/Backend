@@ -16,6 +16,9 @@ async def get_user(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
 ) -> UserExported:
+    """
+    Returns information on a given user as UserExported object
+    """
     email = JWT.get_email(token)
 
     # before obtaining user, prune any dead CWs

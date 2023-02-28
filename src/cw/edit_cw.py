@@ -29,6 +29,10 @@ async def edit_cw(
     cw_id: str = None,
     root: ContentWarningPosting = None,
 ) -> ContentWarningReduced:
+    """
+    Edits specified CW, returns ContentWarningReduced
+    """
+
     if cw_id is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No CW ID given.")
 

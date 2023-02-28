@@ -9,6 +9,9 @@ password_reset_request_router = APIRouter()
 
 @password_reset_request_router.get("/user/password-reset-request")
 def password_reset_request(email: str) -> str:
+    """
+    Sends password reset email, returns string of operation status
+    """
     json_response = {"response": "Check your email for a password reset code."}
 
     # create a new verification code for the user
