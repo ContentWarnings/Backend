@@ -182,3 +182,5 @@ class ContentWarningNames(str, Enum):
     White_Supremacy = "White Supremacy"
     Workplace_Harassment = "Workplace Harassment"
     None_Type = "None"  # used for deleting CWs
+    Deportation_Displacement = "Deportation Displacement"
+    Sex_Work_Slavery = "Sex Work Slavery"
