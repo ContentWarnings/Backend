@@ -48,9 +48,15 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
 
 @vote_router.get("/cw/{id}/upvote")
 def upvote(id: str, request: Request) -> str:
+    """
+    Attempts to upvote CW, returns success or failure strings
+    """
     return __vote_helper(id, IPAddress.get_ip_address(request), upvote=True)
 
 
 @vote_router.get("/cw/{id}/downvote")
 def downvote(id: str, request: Request) -> str:
+    """
+    Attempts to downvote CW, returns success or failure strings
+    """
     return __vote_helper(id, IPAddress.get_ip_address(request), upvote=False)

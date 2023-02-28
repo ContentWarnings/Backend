@@ -26,7 +26,11 @@ async def post_cw(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
     root: ContentWarningPosting = None,
-) -> Dict[ContentWarningReduced, Dict[str, str]]:
+):
+    """
+    Post CW obj to databases (user, CW, movies), and return list of ContentWarningReduced
+    """
+
     if root is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

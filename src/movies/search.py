@@ -39,6 +39,10 @@ def search(
     sort: MovieReducedFields = MovieReducedFields.default_ascending,
     genre: Genre = Genre.Disregard,
 ):
+    """
+    Return list of MovieReduced objects
+    """
+
     # retrieve trending movies if query string is null or empty
     response = (
         get_trending_movies()

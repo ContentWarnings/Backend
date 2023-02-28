@@ -9,6 +9,9 @@ login_user_router = APIRouter()
 
 @login_user_router.post("/auth/login")
 def login_user(incoming_user: UserReduced):
+    """
+    Logs in a user, returns JWT string
+    """
     user = UserTable.get_user(incoming_user.email)
 
     if user is None:
