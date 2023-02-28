@@ -17,14 +17,18 @@ async def delete_user_request(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
 ) -> str:
+    json_response = {"response": "Check your email for a deletion reset code."}
+
     email = JWT.get_email(token)
     deletion_code = CodeGenerator.create_new_verification_code()
     retval = UserVerificationTable.add_new_verification_code_to_user(
         email, deletion_code=deletion_code
     )
+
     if type(retval) is tuple:
-        raise HTTPException(status_code=retval[0], detail=retval[1])
+        UserVerificationTable.log_invalid_email(email)
+        return json_response
 
     Emailer.send_code_via_email(email, deletion_code, Emailer.VerificationCode.DELETION)
 
-    return {"response": "Check your email for a deletion reset code."}
+    return json_response

@@ -105,3 +105,13 @@ class UserVerificationTable:
             TableName=UserVerificationTable.USER_VERIFICATION_TABLE,
             Item=UserVerificationTable.__itemize_UserVerification_to_db_entry(uv_obj),
         )
+
+    @staticmethod
+    def log_invalid_email(email: str) -> None:
+        """
+        To protect security of users, we will return success codes even with invalid emails,
+        but we still log info to backend
+        """
+        print(
+            f"Invalid email '{email}' given for reset code purposes, but returning success for user security."
+        )
