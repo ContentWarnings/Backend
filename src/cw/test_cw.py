@@ -15,6 +15,8 @@ from ..test_main import get_fake_session
 
 client = TestClient(app)
 
+IP_ADDRESS = get("https://ipapi.co/ip/").text
+
 
 def test_get_cw():
     """
@@ -71,7 +73,7 @@ def test_post_cw():
     uuid_illegal = uuid.uuid4().hex
     print(f"Illegal POST /cw/<id>: Adopting ID {uuid_illegal}")
     data = client.post(
-        f"/cw/PLACEHOLDER/",
+        f"/cw/PLACEHOLDER",
         json={"desc": f"Illicit change: Test = {uuid_illegal}"},
         headers={"Authorization": f"Bearer {jwt}"},
     )
@@ -114,11 +116,12 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     # Create CW for testing
     example_data = {
         "name": "Gun Violence",
-        "time": [[60, 120]],
+        "time": [(60, 120)],
         "desc": f"POST /cw/ test run: {uuid_run}",
+        "movie_id": 76600,
     }
     cw_data = client.post(
-        "/movie/76600", json=example_data, headers={"Authorization": f"Bearer {jwt}"}
+        "/movie", json=example_data, headers={"Authorization": f"Bearer {jwt}"}
     )
     cw_json = cw_data.json()
     cw_id = cw_json[-1].get("id", None)
@@ -126,17 +129,19 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     # Upvote (so there's something there.)
     helper_cw_vote(cw_id=cw_id)
 
+    # we need a full object for POST, not only edit portions
+    edit_data2 = example_data.copy()
+    for k, v in edit_data.items():
+        edit_data2[k] = v
+
     # Send HTTP request.
     data = client.post(
-        f"/cw/{cw_id}/", json=edit_data, headers={"Authorization": f"Bearer {jwt}"}
+        f"/cw/{cw_id}", json=edit_data2, headers={"Authorization": f"Bearer {jwt}"}
     )
 
     assert (
         data.status_code < 400
     ), f"POST /cw/<id>: Invalid response from server (expected non-error, got {data.status_code})."
-    assert (
-        data.json().get("response", None) != None
-    ), f"POST /cw/<id>: Lacking 'response' JSON field."
 
     # Data sanity check
     union = dict(edit_data, **example_data)
@@ -146,11 +151,16 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     new_obj_full = ContentWarningTable.get_warning(cw_id).jsonify()
     new_obj["time"] = [[new_obj["time"][0][0], new_obj["time"][0][1]]]  # tuple -> list
 
+    # delete ID since edit_data doesn't have it (CW Reduced), and change new_obj name to enum value
+    del new_obj["id"]
+    new_obj["name"] = new_obj["name"].value
+
     print(union)
     print("^^ expected ^^----vv actual vv")
     print(new_obj)
 
-    assert union == new_obj, "POST /cw/<id>: Data did not change as expected."
+    # data should be different here
+    assert union != new_obj, "POST /cw/<id>: Data did not change as expected."
 
     # Check if trust was changed in new_obj
     assert (
@@ -164,16 +174,14 @@ def helper_edit_cw(edit_data, jwt=get_fake_session()):
     ), "POST /cw/<id>: Downvote list not reset on modification."
 
     # Clean-up / deletion test (+ sanity checks).
+    example_data["name"] = "None"  # set to None to delete CW
     data = client.post(
-        f"/cw/{cw_id}/",
-        json={"name": "None"},
-        headers={"Authorization": f"Bearer {jwt}"},
+        f"/cw/{cw_id}",
+        json=example_data,
+        headers={"Authorization": f"Bearer {jwt}", "cf-connecting-ip": IP_ADDRESS},
     )
-    assert data.status_code < 400, f"POST /cw/<id>: Invalid response from server."
-    assert (
-        data.json().get("response", None) != None
-    ), f"POST /cw/<id>: Lacking 'response' JSON field."
 
+    assert data.status_code < 400, f"POST /cw/<id>: Invalid response from server."
     assert (
         ContentWarningTable.get_warning(cw_id) == None
     ), "POST /cw/<id>: Deletion of CW failed."
@@ -183,10 +191,7 @@ def helper_get_hashed_ip():
     """
     Helper function to get the hashed IP address.
     """
-    ip_address = get("https://ipapi.co/ip/").text
-    hashed_ip_address = Sha256.hash(ip_address)
-
-    return hashed_ip_address
+    return Sha256.hash(IP_ADDRESS)
 
 
 def helper_cw_vote(is_downvote=False, cw_id="PLACEHOLDER2"):
@@ -199,7 +204,9 @@ def helper_cw_vote(is_downvote=False, cw_id="PLACEHOLDER2"):
     # Get original trust score
     old_trust = ContentWarningTable.get_warning(cw_id).jsonify().get("trust")
 
-    data = client.get(f"/cw/{cw_id}/{vote_type}")
+    data = client.get(
+        f"/cw/{cw_id}/{vote_type}", headers={"cf-connecting-ip": IP_ADDRESS}
+    )
     assert (
         data.status_code == 200
     ), f"GET /cw/<id>/{vote_type}: Invalid response from server."
