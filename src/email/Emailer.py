@@ -34,6 +34,85 @@ class Emailer:
         PASSWORD_RESET = "Password Reset"
 
     @staticmethod
+    def generate_html(subject: str, body: str, link: str):
+        return f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        * {{
+            box-sizing: border-box;
+            transition: background-color 100ms cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+        html, body, .bkgd {{
+            background-color: #1e1e1e;
+            background: #1e1e1e;
+            color: white;
+            margin: 0;
+            font-family: "Roboto", sans-serif;
+        }}
+        .nav {{
+            width: 100%;
+            text-align: center;
+            background-color: #7e57c2;
+            background: #7e57c2;
+            padding: 10px;
+            height: 70px;
+        }}
+        .main {{
+            max-width: 500px;
+            width: 100%;
+            margin: auto;
+            padding: 10px;
+        }}
+        p {{
+            font-size: 18px;
+            margin: 0;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }}
+        a {{
+            background-color: #7e57c2;
+            background: #7e57c2;
+            padding: 7px 14px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 21px;
+            margin: 10px 0;
+            color: #ffffff!important;
+            display: inline-block;
+            text-decoration: none;
+        }}
+        a:hover {{
+            background-color: #b085f5;
+            background: #b085f5;
+        }}
+        img {{
+            color: white;
+            font-weight: bold;
+            font-size: 42px;
+            color: #ffffff;
+            height: 50px;
+            display: inline-block;
+            width: fit-content;
+            border: none;
+        }}
+    </style>
+</head>
+<body class="bkgd">
+    <div class="nav">
+        <img alt="MovieMentor" src="https://moviementor.app/logotext.png"></img>
+    </div>
+    <div class="main">
+        <h1>{subject}</h1>
+        <p>{body}</p>
+        <a style="color: #ffffff" color="white" href="{link}">Verify</a>
+    </div>
+</body>
+</html>
+        """
+
+    @staticmethod
     def perform_email_validation(email: str) -> None:
         """
         Validates given email, raising errors if invalid
@@ -43,25 +122,25 @@ class Emailer:
             validate_email(email)
         except EmailNotValidError as ex:
             # logging
-            print(f"Error validating email {email}")
+            print(f"Error validating email!")
             print(ex)
 
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                detail=f"Email {email} is invalid.",
+                detail=f"Email address is invalid.",
             )
 
     @staticmethod
     def __send_email(receiver_email: str, subject: str, msg: str) -> bool:
         Emailer.perform_email_validation(receiver_email)
 
-        print(f"Sending email of {msg} to {receiver_email}")  # logging
+        print(f"Email dispatch!")  # logging
 
         message = Mail(
             from_email=Emailer.__SENDER_EMAIL,
             to_emails=receiver_email,
             subject=subject,
-            html_content=f"<h3>{msg}</h3>",
+            html_content=msg,
         )
         try:
             sg = SendGridAPIClient(Emailer.__SENDGRID_API_KEY)
@@ -85,7 +164,22 @@ class Emailer:
         """
 
         subject = f"MovieMentor {code_type.value} Code"
+
         message = (
             f"Thank you for using MovieMentor! Your {code_type.value} code is {code}."
         )
-        return Emailer.__send_email(receiver_email, subject, message)
+        link = f"https://moviementor.app/account/verify?src={code_type.value.lower().replace(' ', '_')}&token={code}"
+
+        if code_type == Emailer.VerificationCode.VERIFICATION:
+            message = "Thank you for signing up as a contributor on MovieMentor! To finish setting up your account, click the Verify button below. If this was not done by you, you can safely ignore this email."
+            link = f"https://moviementor.app/account/verify?src=register&token={code}&email={receiver_email}"
+        elif code_type == Emailer.VerificationCode.DELETION:
+            message = "It's sad to see you go! To finish deleting your account, click the Verify button below while logged into your MovieMentor account."
+            link = f"https://moviementor.app/account/verify?src=delete&token={code}"
+        elif code_type == Emailer.VerificationCode.PASSWORD_RESET:
+            message = "We heard you forgot your password! To finish deleting your account, click the Verify button below. If this was not done by you, you can safely ignore this email."
+            link = f"https://moviementor.app/account/verify/passwd?email={receiver_email}&token={code}"
+
+        html = Emailer.generate_html(subject, message, link)
+
+        return Emailer.__send_email(receiver_email, subject, html)
