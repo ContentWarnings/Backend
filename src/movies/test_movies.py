@@ -9,8 +9,11 @@ from ..main import app
 from ..cw import ContentWarning
 from . import MovieReduced, MovieFull
 from ..test_main import get_fake_session
+from requests import get
 
 client = TestClient(app)
+
+IP_ADDRESS = get("https://ipapi.co/ip/").text
 
 
 def test_get_movie():
