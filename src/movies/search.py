@@ -25,11 +25,44 @@ dynamodb_client = boto3.client("dynamodb")
 MOVIES_TABLE = os.environ["MOVIES_TABLE"]
 
 
-def get_trending_movies() -> requests.Response:
+def get_trending_movies(genre=Genre.Disregard) -> requests.Response:
     """
     Returns trending movies from the last day, in JSON format
     """
-    return TMDB.hit_api("trending/movie/day")
+
+    if genre == Genre.Disregard:
+        return TMDB.hit_api("trending/movie/day")
+    else:
+        gid = GENRE_MAP[genre]
+        genre = genre.lower()
+
+        return TMDB.hit_api("discover/movie", f"&with_genres={gid}")
+
+
+def search_movie(query: str, mm_page: int):
+    output = []
+
+    pages_to_sum = 3
+
+    # MovieMentor page -> TMDB page to start at
+    tmdb_start_page = ((mm_page - 1) // pages_to_sum) + 1
+
+    for subpage in range(0, pages_to_sum):
+        tmdb_page = tmdb_start_page + subpage
+        response = TMDB.hit_api("search/movie", f"&query={query}&page={tmdb_page}")
+        json_map: dict = json.loads(response.text)
+        for val in json_map["results"]:
+            output.append(val)
+
+        # Do not call additional pages if there are no more pages!
+        if tmdb_page >= json_map["total_pages"]:
+            break
+
+    obj = {
+        "results": output
+    }
+
+    return obj
 
 
 @search_router.get("/search")
@@ -45,12 +78,16 @@ def search(
 
     # retrieve trending movies if query string is null or empty
     response = (
-        get_trending_movies()
+        get_trending_movies(genre)
         if q is None or len(q.strip()) == 0
-        else TMDB.hit_api("search/movie", f"&query={q}&page={p}")
+        else search_movie(q, p)
     )
 
-    json_map: dict = json.loads(response.text)
+    if type(response) == dict:
+        json_map: dict = response
+    else:
+        json_map: dict = json.loads(response.text)
+
 
     movies_list: List[MovieReduced] = []
 
