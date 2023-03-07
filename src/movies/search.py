@@ -33,13 +33,15 @@ def get_trending_movies(genre=Genre.Disregard, mm_page=1) -> requests.Response:
 
     if genre == Genre.Disregard:
         if mm_page == 1:
-            return TMDB.hit_api("trending/movie/day")
+            return TMDB.hit_api("trending/movie/day").json()
         else:
             return {"results": []}
     else:
         gid = GENRE_MAP[genre]
 
-        return search_movie(query="", mm_page=mm_page, endpoint="discover/movie", genre_id=gid)
+        return search_movie(
+            query="", mm_page=mm_page, endpoint="discover/movie", genre_id=gid
+        )
 
 
 def search_movie(
@@ -97,7 +99,7 @@ def search(
     movies_list: List[MovieReduced] = []
 
     # return empty list if no results
-    if "results" not in json_map.keys():
+    if len(json_map.get("results", [])) <= 0:
         # logging
         print("No results for TMDB search.")
         print(json_map)

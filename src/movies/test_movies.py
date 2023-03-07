@@ -233,7 +233,7 @@ def test_get_search_p():
     """
 
     # Get if p set.
-    data = client.get("/search?q=Avatar&p=2")
+    data = client.get("/search?q=Avata&p=2")  # 61 results.
     assert data.status_code == 200, "GET /search?p: Invalid response from server."
 
     data_json = data.json()
