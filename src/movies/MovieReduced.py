@@ -68,7 +68,7 @@ class MovieReduced(BaseModel):
         UNKNOWN = "Unknown"
 
         def get_val(key: str) -> str:
-            val = json_map[key]
+            val = json_map.get(key, None)
             return UNKNOWN if (val is None or val == "") else val
 
         def get_mpa(id: int) -> str:
