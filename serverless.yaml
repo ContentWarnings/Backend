@@ -68,6 +68,7 @@ package:
     - "*/**"
   include:
     - "src/**"
+    - "images/**"
 
 plugins:
   - serverless-python-requirements

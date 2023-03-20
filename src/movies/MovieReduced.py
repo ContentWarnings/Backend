@@ -2,6 +2,7 @@
 # https://fastapi.tiangolo.com/tutorial/response-model/
 # https://www.themoviedb.org/talk/5f3ef4eec175b200365ee352
 
+from .get_unknown_genre_poster import get_unknown_poster_url
 from ..databases.MovieTable import MovieTable
 from .PosterPath import PosterPath
 from ..tmdb.tmdb import TMDB
@@ -97,6 +98,9 @@ class MovieReduced(BaseModel):
         cw: List[str] = [
             cw_obj.name.value for cw_obj in MovieTable.get_all_ContentWarnings(movie_id)
         ]
+
+        if image == UNKNOWN:
+            image = get_unknown_poster_url(genres)
 
         return MovieReduced(
             id=movie_id,

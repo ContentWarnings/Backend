@@ -1,6 +1,7 @@
 # References
 # https://www.w3schools.com/python/ref_list_sort.asp
 
+from .get_unknown_genre_poster import get_unknown_poster_url
 from .StreamingInfo import StreamingInfo
 from .PosterPath import PosterPath
 from ..databases.MovieTable import MovieTable
@@ -120,6 +121,11 @@ class MovieFull(BaseModel):
                     movie_full_fields[k] = UNKNOWN_STR
                 elif v.type_ is int or v.type_ is float:
                     movie_full_fields[k] = UNKNOWN_INT
+
+        if movie_full_fields["img"] == UNKNOWN_STR:
+            movie_full_fields["img"] = get_unknown_poster_url(
+                movie_full_fields["genres"]
+            )
 
         return MovieFull(**movie_full_fields)
 
