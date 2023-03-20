@@ -1,3 +1,6 @@
+# References
+# https://stackoverflow.com/questions/62359413/how-to-return-an-image-in-fastapi
+
 from ..tmdb.genres import Genre
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
