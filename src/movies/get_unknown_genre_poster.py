@@ -17,6 +17,9 @@ def get_unknown_poster_url(genres: List[str]):
     if len(genres) > 0:
         genre = genres[0]
 
+    # encode spaces for hitting the image URL endpoint
+    genre = genre.replace(" ", "%20")
+
     return f"https://api.moviementor.app/genre_poster/{genre}"
 
 
