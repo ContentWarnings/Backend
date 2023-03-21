@@ -36,7 +36,7 @@ class MovieFull(BaseModel):
             ("id", "id"),
             ("imdb_id", "imdb"),
             (None, "cmid"),
-            ("original_title", "title"),
+            ("title", "title"),
             ("release_date", "release"),
             ("poster_path", "img"),
             ("backdrop_path", "backdrop"),

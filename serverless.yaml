@@ -4,6 +4,7 @@
 # https://github.com/jordaneremieff/serverless-mangum-examples/blob/main/fastapi-example/serverless.yml
 # https://github.com/serverless/serverless/blob/main/docs/providers/aws/events/apigateway.md
 # https://github.com/dougmoscrop/serverless-http/blob/master/docs/EXAMPLES.md
+# https://www.serverless.com/blog/dynamodb-on-demand-serverless
 
 service: content-warnings-backend
 
@@ -84,9 +85,7 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.movieTableName}
     CWTable:
       Type: AWS::DynamoDB::Table
@@ -97,9 +96,7 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.cwTableName}
     UserVerificationTable:
       Type: AWS::DynamoDB::Table
@@ -110,9 +107,7 @@ resources:
         KeySchema:
           - AttributeName: email
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.userVerificationTableName}
     UserTable:
       Type: AWS::DynamoDB::Table
@@ -123,7 +118,5 @@ resources:
         KeySchema:
           - AttributeName: email
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.userTableName}
