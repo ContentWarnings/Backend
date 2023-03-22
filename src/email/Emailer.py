@@ -157,7 +157,7 @@ class Emailer:
 
     @staticmethod
     def send_code_via_email(
-        receiver_email: str, code: str, code_type: VerificationCode
+        receiver_email: str, code: str, code_type: VerificationCode, prev_email: str = None
     ) -> bool:
         """
         Sends a verification code of specified type to specified email
@@ -170,7 +170,10 @@ class Emailer:
         )
         link = f"https://moviementor.app/account/verify?src={code_type.value.lower().replace(' ', '_')}&token={code}"
 
-        if code_type == Emailer.VerificationCode.VERIFICATION:
+        if code_type == Emailer.VerificationCode.VERIFICATION and prev_email != None:
+            message = "Thank you for using MovieMentor! To finish changing your email, click the Verify button below. If this was not done by you, you can safely ignore this email."
+            link = f"https://moviementor.app/account/verify?src=edit&token={code}&email={prev_email}"
+        elif code_type == Emailer.VerificationCode.VERIFICATION:
             message = "Thank you for signing up as a contributor on MovieMentor! To finish setting up your account, click the Verify button below. If this was not done by you, you can safely ignore this email."
             link = f"https://moviementor.app/account/verify?src=register&token={code}&email={receiver_email}"
         elif code_type == Emailer.VerificationCode.DELETION:
