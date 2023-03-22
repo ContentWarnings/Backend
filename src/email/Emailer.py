@@ -94,7 +94,7 @@ class Emailer:
             color: #ffffff;
             height: 50px;
             display: inline-block;
-            width: fit-content;
+            width: auto;
             border: none;
         }}
     </style>
