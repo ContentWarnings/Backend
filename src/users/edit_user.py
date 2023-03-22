@@ -1,7 +1,7 @@
 from .CodeGenerator import CodeGenerator
 from ..email.Emailer import Emailer
 from ..security.Bcrypter import Bcrypter
-from ..users.User import UserReduced
+from ..users.User import UserEdit
 from ..databases.UserTable import UserTable
 from ..databases.UserVerificationTable import UserVerificationTable
 from ..security.Authentication import Authentication
@@ -19,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def edit_user(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
-    incoming_user: UserReduced = None,
+    incoming_user: UserEdit = None,
 ) -> str:
     """
     Edits user info, returning string of operation status
@@ -32,10 +32,15 @@ async def edit_user(
 
     prev_user = UserTable.get_user_from_decoded_jwt(JWT.get_email(token))
 
-    passwords_match = Bcrypter.do_passwords_match(
-        incoming_user.password, prev_user.password
-    )
-    emails_match = True if prev_user.email == incoming_user.email else False
+    passwords_match = True
+    if incoming_user.password is not None:
+        passwords_match = Bcrypter.do_passwords_match(
+            incoming_user.password, prev_user.password
+        )
+
+    emails_match = True
+    if incoming_user.email is not None:
+        emails_match = True if prev_user.email == incoming_user.email else False
 
     if passwords_match and emails_match:
         return {"response": "No changes to user information."}
