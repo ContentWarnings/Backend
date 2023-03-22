@@ -157,7 +157,10 @@ class Emailer:
 
     @staticmethod
     def send_code_via_email(
-        receiver_email: str, code: str, code_type: VerificationCode, prev_email: str = None
+        receiver_email: str,
+        code: str,
+        code_type: VerificationCode,
+        prev_email: str = None,
     ) -> bool:
         """
         Sends a verification code of specified type to specified email

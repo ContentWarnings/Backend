@@ -88,7 +88,10 @@ async def edit_user(
     UserTable.edit_user(prev_user)
 
     Emailer.send_code_via_email(
-        incoming_user.email, verif_code, Emailer.VerificationCode.VERIFICATION, prev_email=JWT.get_email(token)
+        incoming_user.email,
+        verif_code,
+        Emailer.VerificationCode.VERIFICATION,
+        prev_email=JWT.get_email(token),
     )
 
     return {
