@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 
 
 class User(BaseModel):
@@ -45,3 +45,12 @@ class UserReduced(BaseModel):
 
     def jsonify(self):
         return self.__dict__
+
+
+class UserEdit(BaseModel):
+    """
+    Objects passed in for editing.
+    """
+
+    email: Union[str, None]
+    password: Union[str, None]
