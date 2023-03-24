@@ -85,7 +85,7 @@ DESCRIPTION_DICT = {
     ContentWarningNames.Hunting: "Any depiction of hunting.",
     ContentWarningNames.Inaccurate_Representation: "Any inaccurate representation of a group, add the specific group and situation in the description.",
     ContentWarningNames.Incest: "Any depiction or mention of incest.",
-    ContentWarningNames.Indentured_Slavery: "Any depiction of indentured servitude or slavery or forced labor.",
+    ContentWarningNames.Indentured_Servitude: "Any depiction of indentured servitude or slavery or forced labor.",
     ContentWarningNames.Injury_Illness: "Any depiction of injury or illness.",
     ContentWarningNames.Imprisonment_Incarceration: "Any depiction of imprisonment or incarceration.",
     ContentWarningNames.Internment_Camps: "Any depiction of an internment camp.",
