@@ -17,6 +17,7 @@ on:
     paths:
       - 'src/**'
       - 'serverless.yaml'
+      - 'requirements.txt'
 
 jobs:
   deploy:
