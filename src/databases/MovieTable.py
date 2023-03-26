@@ -3,7 +3,7 @@ from ..movies.MovieStub import MovieStub
 from ..cw.ContentWarning import ContentWarning
 import boto3
 import os
-from typing import List, Dict
+from typing import List, Dict, Union
 
 
 class MovieTable:
@@ -27,7 +27,7 @@ class MovieTable:
         }
 
     @staticmethod
-    def get_all_ContentWarnings(id: int) -> List[ContentWarning]:
+    def get_all_ContentWarnings(id: int) -> List[Union[ContentWarning, None]]:
         """
         Return all ContentWarning objects from given movie/TMDB id
         """
