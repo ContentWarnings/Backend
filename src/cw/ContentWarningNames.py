@@ -184,3 +184,7 @@ class ContentWarningNames(str, Enum):
     None_Type = "None"  # used for deleting CWs
     Deportation_Displacement = "Deportation, Displacement"
     Sex_Work_Slavery = "Sex Work / Slavery"
+    Smoking = "Smoking"
+    Sexually_Transmitted_Diseases = "Sexually Transmitted Diseases / Infections"
+    Diagnosis_of_HIV_AIDS = "Diagnosis of HIV, AIDS"
+    Car_Accidents = "Car Accidents"

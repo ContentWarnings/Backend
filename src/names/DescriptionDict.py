@@ -180,4 +180,8 @@ DESCRIPTION_DICT = {
     ContentWarningNames.None_Type: "No description.",
     ContentWarningNames.Deportation_Displacement: "Any depiction of deportation or displacement from an established home.",
     ContentWarningNames.Sex_Work_Slavery: "Any depiction of sex work or sex slavery.",
+    ContentWarningNames.Smoking: "Any depiction of smoking (cigarettes/cigars/tobacco, marijuana, etc.).",
+    ContentWarningNames.Sexually_Transmitted_Diseases: "Any depiction of contracting STDs/STIs or images of effects (ex: herpes).",
+    ContentWarningNames.Diagnosis_of_HIV_AIDS: "Any depiction of characters being diagnosed with HIV/AIDS.",
+    ContentWarningNames.Car_Accidents: "Any situation revolving around a car crash.",
 }
