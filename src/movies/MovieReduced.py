@@ -96,7 +96,9 @@ class MovieReduced(BaseModel):
                 pass
 
         cw: List[str] = [
-            cw_obj.name.value for cw_obj in MovieTable.get_all_ContentWarnings(movie_id) if cw_obj is not None
+            cw_obj.name.value
+            for cw_obj in MovieTable.get_all_ContentWarnings(movie_id)
+            if cw_obj is not None
         ]
 
         if image == UNKNOWN:
