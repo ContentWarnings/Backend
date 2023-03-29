@@ -71,7 +71,8 @@ class ContentWarning(BaseModel):
         """
         Returns number of downvotes needed to delete CW
         """
-        return 5
+        # we want 5 downvotes, but remember set contains an empty string else dynamo complains
+        return 6
 
     def to_ContentWarningReduced(self) -> ContentWarningReduced:
         """

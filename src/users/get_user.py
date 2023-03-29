@@ -21,7 +21,7 @@ async def get_user(
     """
     email = JWT.get_email(token)
 
-    # before obtaining user, prune any dead CWs
-    UserTable.prune_cw_list(email)
+    # before obtaining user, prune any dead CWs (also updates low trust status)
+    UserTable.prune_downvoted_cws_and_update_low_trust(email)
 
     return UserExported.create(UserTable.get_user_from_decoded_jwt(email)).jsonify()

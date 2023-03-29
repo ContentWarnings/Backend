@@ -39,6 +39,15 @@ async def post_cw(
 
     ProfanityChecker.check_string(root.desc)
 
+    email = JWT.get_email(token)
+
+    # if user is low trust, act like we add their CW to DB, but secretly shadow ban by not
+    # persisting any content from them. Simply return empty list in this case.
+    low_trust_user_obj = UserTable.prune_downvoted_cws_and_update_low_trust(email)
+    if low_trust_user_obj is not None and low_trust_user_obj.is_low_trust:
+        print(f"User {email} is low trust, so discarding CW {root}.")
+        return []
+
     # add cw to CW table
     full_cw = root.to_ContentWarningReduced().to_ContentWarning()
     result = ContentWarningTable.add_warning(full_cw)
@@ -46,7 +55,6 @@ async def post_cw(
         raise HTTPException(status_code=result[0], detail=result[1])
 
     # add cw UUID to user object
-    email = JWT.get_email(token)
     user = UserTable.get_user(email)
     if user is None:
         raise HTTPException(
