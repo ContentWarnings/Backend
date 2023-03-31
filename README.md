@@ -63,7 +63,13 @@ source venv/bin/activate
 # Run Black to make sure formatting is compliant.
 black src/*
 
-# Run Pytest tests
+# Running Pytests locally
+# Step 1: export env. vars via terminal.
+export TMDB_API_KEY=...
+export MOVIES_TABLE=...
+export JWT_ALGORITHM=...
+...
+# Step 2: run test command.
 pytest
 
 # Push to Git.

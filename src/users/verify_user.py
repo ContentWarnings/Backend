@@ -2,12 +2,16 @@ from ..users.User import User
 from .UserVerification import UserVerificationReduced
 from ..databases.UserTable import UserTable
 from ..databases.UserVerificationTable import UserVerificationTable
+from ..databases.LowTrustUserTable import LowTrustUserTable
 from fastapi import APIRouter, HTTPException, status
 
 verify_user_router = APIRouter()
 
 
 def complete_new_email_verif_process(user: User) -> None:
+    old_email = user.email
+    new_email = user.new_pending_email
+
     # persist any delete codes to new user, and also delete old uv object
     old_uv_obj = UserVerificationTable.get_user_verification_obj(user.email)
     UserVerificationTable.delete_user_verification_obj(user.email)
@@ -23,6 +27,9 @@ def complete_new_email_verif_process(user: User) -> None:
 
     # we're using edit function here so cw's, etc., are persisted
     UserTable.edit_user(user)
+
+    # if the user is low trust, re-assign old email to new one so their low trust status persists
+    LowTrustUserTable.change_email(old_email, new_email)
 
 
 @verify_user_router.post("/user/verify")

@@ -34,7 +34,10 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
                 and len(cw.downvotes)
                 >= ContentWarning.get_num_downvotes_deletion_threshold()
             ):
+                # logging
                 print(f"Trust of CW {cw.id} is too low. Deleting.")
+                print(f"CW Trust: {cw.trust}.")
+                print(f"CW # downvotes {len(cw.downvotes)}")
 
                 # yes, technically, we don't delete CW from user table, but the ID will refer
                 # to nothing in the other tables, so it's effectively deleted. We can't delete
@@ -42,6 +45,12 @@ def __vote_helper(cw_id: str, ip_address: str, upvote: bool = True) -> str:
                 # will suffice for now, and runtime penalties are basically non-existent.
                 MovieTable.delete_warning_from_movie(cw.movie_id, cw.id)
                 ContentWarningTable.delete_warning(cw.id)
+
+                # execution reaches here if enough users downvote a CW, triggering a deletion.
+                # Thus, we must update the trust rating of the user who posted this CW. We don't
+                # directly do so here, but rather next time the user themself takes an action
+                # ex: get user, post cw, etc., since we can't go from a CW -> user (currently), only
+                # from a user -> CW.
 
     return {"response": retval}
 

@@ -63,7 +63,7 @@ async def edit_cw(
         res3 = UserTable.delete_cw(email, cw_id)
 
         # after deleting CW, prune if need be
-        UserTable.prune_cw_list(email)
+        UserTable.prune_downvoted_cws_and_update_low_trust(email)
 
         res1.update(res2)
         res1.update(res3)

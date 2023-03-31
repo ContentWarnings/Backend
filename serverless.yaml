@@ -41,11 +41,13 @@ provider:
             - Fn::GetAtt: [CWTable, Arn]
             - Fn::GetAtt: [UserVerificationTable, Arn]
             - Fn::GetAtt: [UserTable, Arn]
+            - Fn::GetAtt: [LowTrustUserTable, Arn]
   environment:
     MOVIES_TABLE: ${self:custom.movieTableName}
     CW_TABLE: ${self:custom.cwTableName}
     USER_VERIFICATION_TABLE: ${self:custom.userVerificationTableName}
     USER_TABLE: ${self:custom.userTableName}
+    LOW_TRUST_USER_TABLE: ${self:custom.lowTrustUserTableName}
 
 # REST API (gives more functionality than HTTP API)
 # to change to an HTTP API, simply replace "http" with "httpApi: '*'"
@@ -63,6 +65,7 @@ custom:
   cwTableName: 'the-cw-table-${self:provider.stage}'
   userVerificationTableName: 'the-user-verification-table-${self:provider.stage}'
   userTableName: 'the-user-table-${self:provider.stage}'
+  lowTrustUserTableName: 'the-low-trust-user-table-${self:provider.stage}'
 
 package:
   exclude:
@@ -120,3 +123,14 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.userTableName}
+    LowTrustUserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.lowTrustUserTableName}
