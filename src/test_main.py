@@ -1,8 +1,10 @@
 # References
 # https://fastapi.tiangolo.com/tutorial/testing/
+# https://automatetheboringstuff.com/2e/chapter7/
 
 from fastapi.testclient import TestClient
 import os
+import re
 
 from .main import app
 from .security.JWT import JWT
@@ -35,9 +37,17 @@ def test_hello_world():
     """
     GET /
     """
+    # major.minor.revision
+    versioning_regex = re.compile(r"\d+.\d+.\d+")
+
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"response": "Hello, world!"}
+
+    response_json = response.json()
+    assert len(response_json) == 1
+    assert "response" in response_json
+    matches = versioning_regex.findall(response_json["response"])
+    assert len(matches) == 1
 
 
 def test_env_variables():
