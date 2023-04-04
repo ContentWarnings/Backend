@@ -52,8 +52,15 @@ app.add_middleware(
 
 
 @app.get("/")
-def hello():
-    return {"response": "Hello, world!"}
+def version():
+    """
+    Returns current backend version: MAJOR.MINOR.REVISION
+    """
+    MAJOR = 1
+    MINOR = 0
+    REVISION = 0
+
+    return {"response": f"{MAJOR}.{MINOR}.{REVISION}"}
 
 
 handler = Mangum(app)

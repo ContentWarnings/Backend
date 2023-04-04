@@ -81,8 +81,14 @@ git push origin adam/bug-fix
 ## Local Development Guide
 
 ```sh
-# (in project root)
+# (all in project root)
 python3 -m pip install gunicorn
+
+export TMDB_API_KEY=...
+export MOVIES_TABLE=...
+export JWT_ALGORITHM=...
+...
+
 python3 -m gunicorn src.main:app --worker-class uvicorn.workers.UvicornWorker
 ```
 
